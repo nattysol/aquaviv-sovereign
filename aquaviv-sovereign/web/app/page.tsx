@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Droplet, ShieldCheck, Zap, Activity } from 'lucide-react';
+import { FadeIn } from '@/components/ui/FadeIn';
 
 export default function Home() {
   return (
@@ -13,48 +14,57 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-accent text-xs font-bold uppercase tracking-wider mb-6">
-              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-              Clinical Grade Hydration
-            </div>
+            <FadeIn delay={0.1}>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-accent text-xs font-bold uppercase tracking-wider mb-6">
+                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                Clinical Grade Hydration
+              </div>
+            </FadeIn>
             
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
-              Reclaim Your <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
-                Cellular Sovereignty
-              </span>
-            </h1>
+            <FadeIn delay={0.2}>
+              <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
+                Reclaim Your <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
+                  Cellular Sovereignty
+                </span>
+              </h1>
+            </FadeIn>
             
-            <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed">
-              Modern water is dead. aquaViv restores the mineral matrix your biology demands. 
-              Experience the difference of true cellular absorption.
-            </p>
+            <FadeIn delay={0.3}>
+              <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed">
+                Modern water is dead. aquaViv restores the mineral matrix your biology demands. 
+                Experience the difference of true cellular absorption.
+              </p>
+            </FadeIn>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/product" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-primary bg-accent rounded-full hover:bg-white transition-all hover:scale-105 shadow-[0_0_20px_rgba(0,229,255,0.3)]">
-                Shop The Ritual
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-              <Link href="/affiliate/join" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white border border-white/20 rounded-full hover:bg-white/10 transition-all">
-                Partner Program
-              </Link>
-            </div>
+            <FadeIn delay={0.4}>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/product" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-primary bg-accent rounded-full hover:bg-white transition-all hover:scale-105 shadow-[0_0_20px_rgba(0,229,255,0.3)]">
+                  Shop The Ritual
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+                <Link href="/affiliate/join" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white border border-white/20 rounded-full hover:bg-white/10 transition-all">
+                  Partner Program
+                </Link>
+              </div>
+            </FadeIn>
           </div>
         </div>
       </section>
 
-      {/* 2. SOCIAL PROOF / TRUST STRIP */}
+      {/* 2. SOCIAL PROOF / TRUST STRIP (Restored & Animated) */}
       <section className="border-b border-slate-100 bg-white">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
-            Trusted by Elite Performers & Practitioners
-          </p>
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-40 grayscale">
-            {/* Placeholder Logos */}
-            {['Equinox', 'Huberman Lab', 'Bulletproof', 'Onnit'].map((brand) => (
-              <span key={brand} className="text-xl font-bold font-serif text-slate-600">{brand}</span>
-            ))}
-          </div>
+          <FadeIn>
+            <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
+              Trusted by Elite Performers & Practitioners
+            </p>
+            <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-40 grayscale">
+              {['Equinox', 'Huberman Lab', 'Bulletproof', 'Onnit'].map((brand) => (
+                <span key={brand} className="text-xl font-bold font-serif text-slate-600">{brand}</span>
+              ))}
+            </div>
+          </FadeIn>
         </div>
       </section>
 
@@ -63,66 +73,151 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
-            {/* Card 1 */}
-            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6">
-                <Activity className="w-6 h-6" />
+            <FadeIn delay={0.1}>
+              <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow h-full">
+                <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6">
+                  <Activity className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-primary mb-3">The Depletion Crisis</h3>
+                <p className="text-slate-500 leading-relaxed">
+                  90% of tap and bottled water is devoid of minerals. Your body is drinking, but your cells are starving.
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-primary mb-3">The Depletion Crisis</h3>
-              <p className="text-slate-500 leading-relaxed">
-                90% of tap and bottled water is devoid of minerals. Your body is drinking, but your cells are starving.
-              </p>
-            </div>
+            </FadeIn>
 
-            {/* Card 2 */}
-            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6">
-                <Zap className="w-6 h-6" />
+            <FadeIn delay={0.2}>
+              <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow h-full">
+                <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6">
+                  <Zap className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-primary mb-3">Electric Bio-Availability</h3>
+                <p className="text-slate-500 leading-relaxed">
+                  Our ionic mineral complex conducts electricity instantly, restoring energy and focus within minutes.
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-primary mb-3">Electric Bio-Availability</h3>
-              <p className="text-slate-500 leading-relaxed">
-                Our ionic mineral complex conducts electricity instantly, restoring energy and focus within minutes.
-              </p>
-            </div>
+            </FadeIn>
 
-            {/* Card 3 */}
-            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6">
-                <ShieldCheck className="w-6 h-6" />
+            <FadeIn delay={0.3}>
+              <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow h-full">
+                <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-primary mb-3">Pure Sovereignty</h3>
+                <p className="text-slate-500 leading-relaxed">
+                  Sourced from ancient inland seabeds, free from modern pollutants, microplastics, and government additives.
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-primary mb-3">Pure Sovereignty</h3>
-              <p className="text-slate-500 leading-relaxed">
-                Sourced from ancient inland seabeds, free from modern pollutants, microplastics, and government additives.
-              </p>
-            </div>
+            </FadeIn>
 
           </div>
         </div>
       </section>
 
-      {/* 4. FEATURED PRODUCT CTA */}
-      <section className="py-24 bg-white">
+     {/* 4. THE SOVEREIGN PROTOCOL (Replaces single product CTA) */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        {/* Subtle background decoration */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-slate-50 rounded-[100%] blur-3xl -z-10" />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-primary rounded-3xl overflow-hidden relative text-white">
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay" />
-            
-            <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center p-12 md:p-20">
-              <div>
-                <h2 className="text-4xl font-bold mb-6">Ready to upgrade your biology?</h2>
-                <p className="text-primary-100 text-lg mb-8 max-w-md">
-                  Start the 30-day hydration protocol. Feel the difference in energy, skin clarity, and cognitive function.
-                </p>
-                <Link href="/product" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-primary bg-white rounded-full hover:bg-accent hover:text-primary transition-colors">
-                  Shop aquaViv Drops
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </div>
-              <div className="flex justify-center">
-                <div className="w-64 h-64 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 animate-pulse-slow">
-                   <Droplet className="w-24 h-24 text-accent" />
-                </div>
-              </div>
+          <FadeIn>
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <span className="text-accent font-bold tracking-widest uppercase text-xs">The Collection</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mt-4 mb-6">The Sovereign Protocol</h2>
+              <p className="text-slate-500 text-lg">
+                A complete system for cellular restoration. Hydrate with Minerals, elevate with Ormus, and energize with Shilajit.
+              </p>
             </div>
+          </FadeIn>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+            
+            {/* 1. THE FOUNDATION: Minerals */}
+            <FadeIn delay={0.1}>
+              <Link href="/product" className="group block">
+                <div className="relative bg-surface-light rounded-2xl overflow-hidden border border-slate-100 transition-all duration-300 hover:shadow-xl hover:border-primary/20 hover:-translate-y-2">
+                  {/* Image Container */}
+                  <div className="h-[400px] flex items-center justify-center p-8 bg-gradient-to-b from-white to-slate-50">
+                    <div className="relative w-full h-full">
+                       {/* Make sure you added minerals.webp to /public */}
+                       <img 
+                         src="/minerals.webp" 
+                         alt="Ionic Trace Minerals" 
+                         className="w-full h-full object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-110"
+                       />
+                    </div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="p-8">
+                    <div className="text-xs font-bold text-primary uppercase tracking-wider mb-2">The Foundation</div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2 group-hover:text-primary transition-colors">Ionic Trace Minerals</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                      Rapid cellular hydration. Restores the electrical potential of your cells.
+                    </p>
+                    <div className="flex items-center text-primary font-bold text-sm">
+                      Shop Ritual <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </FadeIn>
+
+            {/* 2. THE ELEVATION: Ormus */}
+            <FadeIn delay={0.2}>
+              <Link href="#" className="group block"> {/* Link to # for now */}
+                <div className="relative bg-surface-light rounded-2xl overflow-hidden border border-slate-100 transition-all duration-300 hover:shadow-xl hover:border-rose-400/30 hover:-translate-y-2">
+                  <div className="h-[400px] flex items-center justify-center p-8 bg-gradient-to-b from-white to-[#fff0f5]">
+                    <div className="relative w-full h-full">
+                       <img 
+                         src="/ormus.webp" 
+                         alt="Rose & Gold Ormus" 
+                         className="w-full h-full object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-110"
+                       />
+                    </div>
+                  </div>
+                  
+                  <div className="p-8">
+                    <div className="text-xs font-bold text-rose-500 uppercase tracking-wider mb-2">The Elevation</div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2 group-hover:text-rose-500 transition-colors">Rose & Gold Ormus</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                      High-spin monoatomic gold infused with organic Bulgarian rose for cognitive flow.
+                    </p>
+                    <div className="flex items-center text-rose-500 font-bold text-sm">
+                      Coming Soon <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </FadeIn>
+
+            {/* 3. THE POWER: Shilajit */}
+            <FadeIn delay={0.3}>
+              <Link href="#" className="group block"> {/* Link to # for now */}
+                <div className="relative bg-surface-light rounded-2xl overflow-hidden border border-slate-100 transition-all duration-300 hover:shadow-xl hover:border-slate-800/20 hover:-translate-y-2">
+                  <div className="h-[400px] flex items-center justify-center p-8 bg-gradient-to-b from-white to-slate-200">
+                    <div className="relative w-full h-full">
+                       <img 
+                         src="/shilajit.webp" 
+                         alt="Pure Shilajit" 
+                         className="w-full h-full object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-110"
+                       />
+                    </div>
+                  </div>
+                  
+                  <div className="p-8">
+                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">The Power</div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2 group-hover:text-slate-600 transition-colors">Pure Liquid Shilajit</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                      The destroyer of weakness. 84+ minerals and fulvic acid for deep energy.
+                    </p>
+                    <div className="flex items-center text-slate-700 font-bold text-sm">
+                      Coming Soon <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </FadeIn>
+
           </div>
         </div>
       </section>

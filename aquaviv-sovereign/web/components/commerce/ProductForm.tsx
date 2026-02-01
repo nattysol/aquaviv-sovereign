@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { ShoppingBag, ShieldCheck, Truck, Leaf, Loader2 } from 'lucide-react';
+import { ShoppingBag, ShieldCheck, Truck, Leaf, Loader2, Lock, Check } from 'lucide-react';
 import clsx from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ProductFormProps {
   basePrice?: number;
@@ -11,13 +12,13 @@ interface ProductFormProps {
     bottle3: string;
     bottle6: string;
   };
-  shopName?: string; // e.g. 'aquaviv.myshopify.com'
+  shopName?: string;
 }
 
 export function ProductForm({ 
-  basePrice = 45.00, 
+  basePrice = 29.95, // Updated default from your screenshot
   variantIds,
-  shopName = 'your-store-name.myshopify.com' // CHANGE THIS LATER
+  shopName = 'aquaviv.myshopify.com'
 }: ProductFormProps) {
   
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +28,7 @@ export function ProductForm({
     {
       id: '1-bottle',
       title: '1 Bottle',
-      subtitle: 'Standard Supply (30 Days)',
+      subtitle: 'Starter Supply (30 Days)',
       price: basePrice,
       discount: 0,
       variantId: variantIds?.bottle1,
@@ -35,7 +36,7 @@ export function ProductForm({
     {
       id: '3-bottles',
       title: '3 Bottles',
-      subtitle: 'Quarterly Supply',
+      subtitle: 'Quarterly Protocol',
       price: (basePrice * 3) * 0.85, 
       discount: 15,
       variantId: variantIds?.bottle3,
@@ -43,7 +44,7 @@ export function ProductForm({
     {
       id: '6-bottles',
       title: '6 Bottles',
-      subtitle: 'Full Regimen',
+      subtitle: 'Complete Sovereignty',
       price: (basePrice * 6) * 0.75, 
       discount: 25,
       bestValue: true,
@@ -54,29 +55,31 @@ export function ProductForm({
   const [selectedId, setSelectedId] = useState('6-bottles');
   const selectedBundle = bundles.find(b => b.id === selectedId) || bundles[2];
 
-  // The Checkout Logic
   const handleCheckout = () => {
     if (!selectedBundle.variantId) {
-      alert("Shopify Variant ID is missing in Sanity!");
+      alert("Shopify Variant ID is missing! Check Sanity.");
       return;
     }
-
     setIsLoading(true);
-
-    // Construct Shopify Cart Permalink
-    // Format: https://{shop}.myshopify.com/cart/{variant_id}:{quantity}
     const checkoutUrl = `https://${shopName}/cart/${selectedBundle.variantId}:1`;
-
-    // Redirect to Shopify
     window.location.href = checkoutUrl;
   };
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Bundle Selection Grid */}
+    <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      
+      {/* ZONE 1: THE MENU (Select Supply) */}
       <div className="flex flex-col gap-4">
-        <p className="text-sm font-bold uppercase tracking-wider text-primary/60">Select Supply</p>
-        <div className="grid grid-cols-1 gap-3">
+        <div className="flex justify-between items-end">
+           <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Select Supply</p>
+           {selectedBundle.discount > 0 && (
+             <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">
+               You are saving {selectedBundle.discount}%
+             </span>
+           )}
+        </div>
+
+        <div className="flex flex-col gap-3">
           {bundles.map((bundle) => {
             const isSelected = selectedId === bundle.id;
             
@@ -85,41 +88,46 @@ export function ProductForm({
                 key={bundle.id}
                 onClick={() => setSelectedId(bundle.id)}
                 className={clsx(
-                  "relative flex items-center p-4 border rounded-xl text-left transition-all duration-200 group",
+                  "relative flex items-center p-4 border rounded-xl text-left transition-all duration-200 group w-full",
                   isSelected 
-                    ? "border-primary bg-primary/5 ring-1 ring-primary" 
-                    : "border-slate-200 hover:border-primary/50 bg-white"
+                    ? "border-primary bg-primary/5 shadow-inner" 
+                    : "border-slate-100 bg-white hover:border-primary/30 hover:shadow-sm"
                 )}
               >
+                {/* Best Value Badge */}
                 {bundle.bestValue && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
-                    Best Value
+                  <span className="absolute -top-3 right-4 bg-accent text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm z-10">
+                    Most Popular
                   </span>
                 )}
                 
+                {/* Radio Circle */}
                 <div className={clsx(
-                  "size-5 rounded-full border-2 mr-4 flex items-center justify-center transition-colors shrink-0",
-                  isSelected ? "border-primary bg-primary" : "border-slate-300"
+                  "size-6 rounded-full border-2 mr-4 flex items-center justify-center transition-colors shrink-0",
+                  isSelected ? "border-primary bg-primary" : "border-slate-200 group-hover:border-primary/50"
                 )}>
-                  {isSelected && <div className="size-2 rounded-full bg-white" />}
+                  {isSelected && <Check className="w-3 h-3 text-white" strokeWidth={4} />}
                 </div>
 
-                <div className="flex-1 w-full">
-                  <div className="flex justify-between items-center mb-1">
+                {/* Text Content */}
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
                     <span className={clsx("font-bold text-lg", isSelected ? "text-primary" : "text-slate-700")}>
                       {bundle.title}
                     </span>
-                    <span className="font-bold text-slate-900">
-                      ${bundle.price.toFixed(2)}
-                    </span>
+                    <div className="text-right">
+                       {bundle.discount > 0 && (
+                         <span className="block text-xs text-slate-400 line-through decoration-slate-300">
+                           ${(bundle.price / (1 - bundle.discount/100)).toFixed(2)}
+                         </span>
+                       )}
+                       <span className="font-bold text-slate-900 block">
+                         ${bundle.price.toFixed(2)}
+                       </span>
+                    </div>
                   </div>
-                  <div className="text-sm text-slate-500 flex justify-between w-full">
-                    <span>{bundle.subtitle}</span>
-                    {bundle.discount > 0 && (
-                      <span className="text-primary font-bold bg-primary/10 px-1.5 rounded text-xs flex items-center">
-                        Save {bundle.discount}%
-                      </span>
-                    )}
+                  <div className="text-sm text-slate-500 font-medium">
+                    {bundle.subtitle}
                   </div>
                 </div>
               </button>
@@ -128,38 +136,41 @@ export function ProductForm({
         </div>
       </div>
 
-      {/* Action Area */}
-      <div className="flex flex-col gap-4">
+      {/* ZONE 2: THE ACTION (Checkout Button) */}
+      <div className="flex flex-col gap-4 pt-2 border-t border-slate-100">
         <button 
           onClick={handleCheckout}
           disabled={isLoading}
-          className="w-full bg-primary hover:bg-[#002a55] text-white font-bold text-lg h-14 rounded-lg shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
+          className="group relative w-full bg-primary hover:bg-[#002a55] text-white font-bold text-lg h-16 rounded-xl shadow-xl hover:shadow-primary/20 transition-all flex items-center justify-between px-6 active:scale-[0.99] overflow-hidden"
         >
+          {/* Subtle Shine Effect */}
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
+
           {isLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <div className="w-full flex justify-center items-center gap-2">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Redirecting to Secure Checkout...</span>
+            </div>
           ) : (
             <>
-              <span>Proceed to Checkout</span>
-              <span className="font-normal opacity-80">- ${selectedBundle.price.toFixed(2)}</span>
-              <ShoppingBag className="w-5 h-5 ml-2" />
+              <div className="flex flex-col items-start leading-tight">
+                <span className="text-sm font-medium text-primary-200 uppercase tracking-wide">Total Total</span>
+                <span>${selectedBundle.price.toFixed(2)}</span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span>Secure Checkout</span>
+                <Lock className="w-4 h-4 text-accent" />
+              </div>
             </>
           )}
         </button>
         
         {/* Trust Signals */}
-        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 py-2 text-xs font-medium text-slate-500">
-          <div className="flex items-center gap-1.5">
-            <Truck className="w-4 h-4" />
-            <span>Free Shipping</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Lab Tested</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Leaf className="w-4 h-4" />
-            <span>Carbon Neutral</span>
-          </div>
+        <div className="flex justify-between px-2 text-[10px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider">
+           <span className="flex items-center gap-1"><Truck className="w-3 h-3" /> Free Shipping</span>
+           <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> Money Back Guarantee</span>
+           <span className="flex items-center gap-1"><Leaf className="w-3 h-3" /> Carbon Neutral</span>
         </div>
       </div>
     </div>

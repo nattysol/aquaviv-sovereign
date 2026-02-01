@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image'; // <--- Import Image component
 import { ShoppingBag, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -12,10 +13,17 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           
-          {/* Logo */}
+          {/* LOGO - Updated */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-primary rounded-tr-lg rounded-bl-lg group-hover:bg-accent transition-colors" />
-            <span className="text-2xl font-bold text-primary tracking-tight">aquaViv</span>
+            <div className="relative h-12 w-48"> {/* Controls logo size */}
+              <Image 
+                src="/logo.svg"
+                alt="aquaViv Sovereign"
+                fill
+                className="object-contain object-left"
+                priority
+              />
+            </div>
           </Link>
 
           {/* Desktop Links */}
@@ -54,7 +62,7 @@ export function Navbar() {
 
       {/* Mobile Menu (Dropdown) */}
       {isOpen && (
-        <div className="md:hidden border-t border-slate-100 bg-white absolute w-full">
+        <div className="md:hidden border-t border-slate-100 bg-white absolute w-full shadow-xl">
           <div className="px-4 py-6 space-y-4 flex flex-col">
             <Link href="/product" className="text-lg font-medium text-slate-900" onClick={() => setIsOpen(false)}>
               The Mineral Drops
