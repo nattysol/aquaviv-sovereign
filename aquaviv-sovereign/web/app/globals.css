@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #003366;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f1923;
+    --foreground: #ffffff;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased; /* Critical for "Luxury" feel */
+}
