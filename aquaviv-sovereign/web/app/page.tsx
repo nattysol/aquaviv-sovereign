@@ -169,7 +169,7 @@ export default function Home() {
 
             {/* 2. THE ELEVATION: Ormus */}
             <FadeIn delay={0.2}>
-              <Link href="/products/rose-gold-ormus" className="group block"> {/* Link to # for now */}
+              <Link href="/products/rose-and-gold-ormus" className="group block">
                 <div className="relative bg-surface-light rounded-2xl overflow-hidden border border-slate-100 transition-all duration-300 hover:shadow-xl hover:border-rose-400/30 hover:-translate-y-2">
                   <div className="h-[400px] flex items-center justify-center p-8 bg-gradient-to-b from-white to-[#fff0f5]">
                     <div className="relative w-full h-full">
@@ -188,7 +188,7 @@ export default function Home() {
                       High-spin monoatomic gold infused with organic Bulgarian rose for cognitive flow.
                     </p>
                     <div className="flex items-center text-rose-500 font-bold text-sm">
-                      Coming Soon <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                      Fresh Batch <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>
                 </div>
