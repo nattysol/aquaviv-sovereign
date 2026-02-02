@@ -3,10 +3,8 @@ import { urlFor } from '@/sanity/lib/image';
 import { ProductForm } from '@/components/commerce/ProductForm';
 import { Star, ChevronDown, Droplet, Activity, ShieldCheck, Leaf, FlaskConical, AlertCircle } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
-import { PortableText } from 'next-sanity';
-import Image from 'next/image';
 
-// 1. DYNAMIC QUERY: Fetches based on the URL 'slug'
+// 1. DYNAMIC QUERY
 const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0] {
   title,
   tagline,
@@ -24,9 +22,17 @@ const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0]
 
 const SHOP_DOMAIN = 'aquaviv.myshopify.com'; 
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
-  // Fetch data using the slug from the URL
-  const product = await client.fetch(PRODUCT_BY_SLUG_QUERY, { slug: params.slug });
+// 2. FIX: Define Params as a Promise
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default async function ProductPage({ params }: PageProps) {
+  // 3. FIX: Await the params to extract the slug string
+  const { slug } = await params;
+  
+  // Now pass the resolved slug to Sanity
+  const product = await client.fetch(PRODUCT_BY_SLUG_QUERY, { slug });
 
   if (!product) {
     return (
@@ -43,7 +49,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
       <div className="max-w-7xl mx-auto px-4 lg:px-10 py-12 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20">
           
-          {/* Left: Gallery (Sticky) */}
+          {/* Left: Gallery */}
           <div className="lg:col-span-7 flex flex-col gap-4 lg:sticky lg:top-24 h-fit">
             <FadeIn>
               <div className="w-full aspect-[4/5] bg-gradient-to-b from-white to-slate-50 rounded-2xl overflow-hidden relative group border border-slate-200 shadow-sm">
@@ -65,7 +71,6 @@ export default async function ProductPage({ params }: { params: { slug: string }
               </div>
             </FadeIn>
             
-            {/* Trust Badges (Mobile/Tablet view) */}
             <div className="flex justify-center gap-6 lg:hidden text-slate-400">
                <ShieldCheck className="w-6 h-6" />
                <Leaf className="w-6 h-6" />
@@ -77,7 +82,6 @@ export default async function ProductPage({ params }: { params: { slug: string }
           <div className="lg:col-span-5 flex flex-col gap-8">
             <FadeIn delay={0.1}>
               <div className="space-y-4 border-b border-slate-100 pb-8">
-                {/* Social Proof Header */}
                 <div className="flex items-center gap-3">
                   <div className="flex text-amber-400">
                     {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
@@ -119,11 +123,11 @@ export default async function ProductPage({ params }: { params: { slug: string }
               />
             </FadeIn>
 
-            {/* Accordions: The Information Architecture */}
+            {/* Accordions */}
             <FadeIn delay={0.3}>
               <div className="border-t border-slate-100 mt-4 space-y-0">
                 
-                {/* 1. Benefits */}
+                {/* Benefits */}
                 <details className="group border-b border-slate-100" open>
                   <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
                     <span className="flex items-center gap-3">
@@ -144,7 +148,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
                   </div>
                 </details>
 
-                {/* 2. Ingredients (Transparency) */}
+                {/* Ingredients */}
                 <details className="group border-b border-slate-100">
                   <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
                     <span className="flex items-center gap-3">
@@ -163,7 +167,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
                   </div>
                 </details>
 
-                {/* 3. The Ritual (Usage) */}
+                {/* Ritual */}
                 <details className="group border-b border-slate-100">
                   <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
                     <span className="flex items-center gap-3">
@@ -187,7 +191,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         </div>
       </div>
 
-      {/* SECTION 2: DEEP DIVE / FAQs */}
+      {/* SECTION 2: FAQs */}
       {product.faqs && (
         <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
           <div className="max-w-3xl mx-auto px-4">
