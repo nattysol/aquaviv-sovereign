@@ -216,7 +216,7 @@ export default function Home() {
                       The destroyer of weakness. 84+ minerals and fulvic acid for deep energy.
                     </p>
                     <div className="flex items-center text-slate-700 font-bold text-sm">
-                      Coming Soon <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                      Shop Shilajit <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>
                 </div>
