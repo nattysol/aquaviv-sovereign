@@ -32,9 +32,8 @@ export default function Home() {
             
             <FadeIn delay={0.3}>
               <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed">
-                Modern water is dead. aquaViv restores the mineral matrix your biology demands. 
-                Experience the difference of true cellular absorption.
-              </p>
+              Modern water is oxidizing your cells. aquaViv utilizes 9-times roasted Bamboo Salt to transform water into a bio-active, antioxidant fluid.
+            </p>
             </FadeIn>
 
             <FadeIn delay={0.4}>
@@ -90,9 +89,11 @@ export default function Home() {
                 <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6">
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-primary mb-3">Electric Bio-Availability</h3>
+                {/* Updated Title */}
+                <h3 className="text-xl font-bold text-primary mb-3">1/10th Molecular Size</h3>
+                {/* Updated Description based on  */}
                 <p className="text-slate-500 leading-relaxed">
-                  Our ionic mineral complex conducts electricity instantly, restoring energy and focus within minutes.
+                  Bamboo salt crystals are 1/10th the size of regular salt (300-600Å). They pass effortlessly through cell membranes for deep, instant hydration.
                 </p>
               </div>
             </FadeIn>
@@ -102,9 +103,11 @@ export default function Home() {
                 <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-primary mb-3">Pure Sovereignty</h3>
+                {/* Updated Title */}
+                <h3 className="text-xl font-bold text-primary mb-3">1,300°C Alchemical Purity</h3>
+                {/* Updated Description based on [cite: 478, 521] */}
                 <p className="text-slate-500 leading-relaxed">
-                  Sourced from ancient inland seabeds, free from modern pollutants, microplastics, and government additives.
+                  Roasted 9 times and melted at 1,300°C. This ancient process eliminates all heavy metals and toxins while synthesizing bio-active sulfur.
                 </p>
               </div>
             </FadeIn>
@@ -138,7 +141,6 @@ export default function Home() {
                   {/* Image Container */}
                   <div className="h-[400px] flex items-center justify-center p-8 bg-gradient-to-b from-white to-slate-50">
                     <div className="relative w-full h-full">
-                       {/* Make sure you added minerals.webp to /public */}
                        <img 
                          src="/minerals.webp" 
                          alt="Ionic Trace Minerals" 
@@ -147,13 +149,16 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  {/* Content */}
+                  {/* Content Container (This was missing) */}
                   <div className="p-8">
                     <div className="text-xs font-bold text-primary uppercase tracking-wider mb-2">The Foundation</div>
                     <h3 className="text-2xl font-bold text-slate-900 mb-2 group-hover:text-primary transition-colors">Ionic Trace Minerals</h3>
+                    
+                    {/* Updated Scientific Description */}
                     <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                      Rapid cellular hydration. Restores the electrical potential of your cells.
+                      9-Times Roasted Bamboo Salt. [cite_start]High alkaline (pH 11.5) and strong reducing power (ORP -430mV) to reverse cellular oxidation[cite: 4, 903, 972].
                     </p>
+                    
                     <div className="flex items-center text-primary font-bold text-sm">
                       Shop Ritual <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                     </div>
