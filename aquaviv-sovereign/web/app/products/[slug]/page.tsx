@@ -3,6 +3,7 @@ import { urlFor } from '@/sanity/lib/image';
 import { ProductForm } from '@/components/commerce/ProductForm';
 import { Star, ChevronDown, Droplet, Activity, ShieldCheck, Leaf, FlaskConical, AlertCircle } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
+import { PortableText } from 'next-sanity';
 
 // 1. DYNAMIC QUERY
 const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0] {
@@ -190,8 +191,19 @@ export default async function ProductPage({ params }: PageProps) {
           </div>
         </div>
       </div>
-
-      {/* SECTION 2: FAQs */}
+{/* SECTION 2: THE DEEP DIVE (Rich Text) */}
+      {product.longDescription && (
+        <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
+          <div className="max-w-3xl mx-auto px-4">
+            <FadeIn>
+              <div className="prose prose-slate prose-lg mx-auto prose-headings:font-bold prose-headings:text-primary prose-p:text-slate-600 prose-li:text-slate-600 prose-strong:text-primary">
+                <PortableText value={product.longDescription} />
+              </div>
+            </FadeIn>
+          </div>
+        </section>
+      )}
+      {/* SECTION 3: FAQs */}
       {product.faqs && (
         <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
           <div className="max-w-3xl mx-auto px-4">
