@@ -71,5 +71,33 @@ export default defineType({
       title: 'Shopify Variant ID (6 Bottles)',
       type: 'string',
     }),
+    defineField({
+      name: 'longDescription',
+      title: 'Deep Dive Description',
+      type: 'array', 
+      of: [{type: 'block'}], // Rich text for "The Science"
+      description: 'The in-depth explanation of the product science.',
+    }),
+    defineField({
+      name: 'ingredients',
+      title: 'Ingredients & Sourcing',
+      type: 'text', // Simple text for now, or use 'image' if you have a label photo
+      rows: 4,
+      description: 'e.g. Magnesium Chloride, Potassium, Sourced from the Great Salt Lake...',
+    }),
+    defineField({
+      name: 'faqs',
+      title: 'Product FAQs',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {name: 'question', type: 'string', title: 'Question'},
+            {name: 'answer', type: 'text', title: 'Answer', rows: 3}
+          ]
+        }
+      ]
+    }),
   ],
 })

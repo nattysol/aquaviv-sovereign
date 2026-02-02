@@ -133,7 +133,7 @@ export default function Home() {
             
             {/* 1. THE FOUNDATION: Minerals */}
             <FadeIn delay={0.1}>
-              <Link href="/product" className="group block">
+              <Link href="/products/aquaviv-mineral-drops" className="group block">
                 <div className="relative bg-surface-light rounded-2xl overflow-hidden border border-slate-100 transition-all duration-300 hover:shadow-xl hover:border-primary/20 hover:-translate-y-2">
                   {/* Image Container */}
                   <div className="h-[400px] flex items-center justify-center p-8 bg-gradient-to-b from-white to-slate-50">
@@ -164,7 +164,7 @@ export default function Home() {
 
             {/* 2. THE ELEVATION: Ormus */}
             <FadeIn delay={0.2}>
-              <Link href="#" className="group block"> {/* Link to # for now */}
+              <Link href="/products/rose-gold-ormus" className="group block"> {/* Link to # for now */}
                 <div className="relative bg-surface-light rounded-2xl overflow-hidden border border-slate-100 transition-all duration-300 hover:shadow-xl hover:border-rose-400/30 hover:-translate-y-2">
                   <div className="h-[400px] flex items-center justify-center p-8 bg-gradient-to-b from-white to-[#fff0f5]">
                     <div className="relative w-full h-full">
@@ -192,7 +192,7 @@ export default function Home() {
 
             {/* 3. THE POWER: Shilajit */}
             <FadeIn delay={0.3}>
-              <Link href="#" className="group block"> {/* Link to # for now */}
+              <Link href="/products/pure-shilajit" className="group block"> {/* Link to # for now */}
                 <div className="relative bg-surface-light rounded-2xl overflow-hidden border border-slate-100 transition-all duration-300 hover:shadow-xl hover:border-slate-800/20 hover:-translate-y-2">
                   <div className="h-[400px] flex items-center justify-center p-8 bg-gradient-to-b from-white to-slate-200">
                     <div className="relative w-full h-full">
