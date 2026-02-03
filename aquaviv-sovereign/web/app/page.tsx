@@ -41,7 +41,7 @@ export default function Home() {
             <FadeIn delay={0.4}>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/product" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-primary bg-accent rounded-full hover:bg-white transition-all hover:scale-105 shadow-[0_0_20px_rgba(0,229,255,0.3)]">
-                  Shop The Ritual
+                  Shop The Minerals
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
                 <Link href="/affiliate/join" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white border border-white/20 rounded-full hover:bg-white/10 transition-all">
@@ -162,7 +162,7 @@ export default function Home() {
                     </p>
                     
                     <div className="flex items-center text-primary font-bold text-sm">
-                      Shop Ritual <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                      Shop Minerals <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>
                 </div>
