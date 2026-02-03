@@ -14,25 +14,27 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl">
+            {/* 1. UPDATED BADGE */}
             <FadeIn delay={0.1}>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-accent text-xs font-bold uppercase tracking-wider mb-6">
                 <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                Clinical Grade Hydration
+                The Blueprint for Cellular Hydration
               </div>
             </FadeIn>
             
+          {/* 2. UPDATED HEADLINE */}
             <FadeIn delay={0.2}>
               <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
-                Reclaim Your <br />
+                Hydration, <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
-                  Cellular Sovereignty
+                  Decoded.
                 </span>
               </h1>
             </FadeIn>
             
             <FadeIn delay={0.3}>
               <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed">
-              Modern water is oxidizing your cells. aquaViv utilizes 9-times roasted Bamboo Salt to transform water into a bio-active, antioxidant fluid.
+              Most water fails to reach the cellular level because it lacks the necessary mineral architecture. aquaViv utilizes nine-times roasted Korean Bamboo Salt to create a high-performance protocol that restores your body’s natural conductive flow.
             </p>
             </FadeIn>
 
@@ -125,7 +127,7 @@ export default function Home() {
           <FadeIn>
             <div className="text-center max-w-2xl mx-auto mb-16">
               <span className="text-accent font-bold tracking-widest uppercase text-xs">The Collection</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mt-4 mb-6">The Sovereign Protocol</h2>
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mt-4 mb-6">The Hydration Protocol</h2>
               <p className="text-slate-500 text-lg">
                 A complete system for cellular restoration. Hydrate with Minerals, elevate with Ormus, and energize with Shilajit.
               </p>
