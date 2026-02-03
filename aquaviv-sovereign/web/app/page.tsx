@@ -6,49 +6,84 @@ export default function Home() {
   return (
     <main className="flex flex-col min-h-screen">
       
-      {/* 1. HERO SECTION */}
-      <section className="relative bg-surface-dark text-white pt-24 pb-32 overflow-hidden">
-        {/* Abstract Background Element */}
+      {/* 1. HERO SECTION (Updated with Split Layout) */}
+      <section className="relative bg-surface-dark text-white pt-16 pb-24 lg:pt-32 lg:pb-40 overflow-hidden">
+        
+        {/* Abstract Background Elements */}
         <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/3 w-[800px] h-[800px] bg-primary rounded-full blur-3xl opacity-20 pointer-events-none" />
         <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/3 w-[600px] h-[600px] bg-accent rounded-full blur-3xl opacity-10 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-3xl">
-            {/* 1. UPDATED BADGE */}
-            <FadeIn delay={0.1}>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-accent text-xs font-bold uppercase tracking-wider mb-6">
-                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                The Blueprint for Cellular Hydration
-              </div>
-            </FadeIn>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
             
-          {/* 2. UPDATED HEADLINE */}
-            <FadeIn delay={0.2}>
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
-                Hydration, <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
-                  Decoded.
-                </span>
-              </h1>
-            </FadeIn>
-            
-            <FadeIn delay={0.3}>
-              <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed">
-              Most water fails to reach the cellular level because it lacks the necessary mineral architecture. aquaViv utilizes nine-times roasted Korean Bamboo Salt to create a high-performance protocol that restores your body’s natural conductive flow.
-            </p>
-            </FadeIn>
+            {/* LEFT COLUMN: Text Content */}
+            <div className="max-w-2xl">
+              <FadeIn delay={0.1}>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-accent text-xs font-bold uppercase tracking-wider mb-6">
+                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                  Clinical Grade Hydration
+                </div>
+              </FadeIn>
+              
+              <FadeIn delay={0.2}>
+                <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
+                  Reclaim Your <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
+                    Cellular Hydration
+                  </span>
+                </h1>
+              </FadeIn>
+              
+              <FadeIn delay={0.3}>
+                <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-lg leading-relaxed">
+                  Modern water is dead. aquaViv restores the mineral matrix your biology demands. 
+                  Experience the difference of true cellular absorption.
+                </p>
+              </FadeIn>
 
-            <FadeIn delay={0.4}>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/product" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-primary bg-accent rounded-full hover:bg-white transition-all hover:scale-105 shadow-[0_0_20px_rgba(0,229,255,0.3)]">
-                  Shop The Minerals
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-                <Link href="/affiliate/join" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white border border-white/20 rounded-full hover:bg-white/10 transition-all">
-                  Partner Program
-                </Link>
-              </div>
-            </FadeIn>
+              <FadeIn delay={0.4}>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link href="/products/aquaviv-mineral-drops" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-primary bg-accent rounded-full hover:bg-white transition-all hover:scale-105 shadow-[0_0_20px_rgba(0,229,255,0.3)]">
+                    Shop The Ritual
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                  <Link href="/affiliate/join" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white border border-white/20 rounded-full hover:bg-white/10 transition-all">
+                    Partner Program
+                  </Link>
+                </div>
+              </FadeIn>
+            </div>
+
+            {/* RIGHT COLUMN: Hero Image (New) */}
+            <div className="hidden lg:block relative">
+              <FadeIn delay={0.5}>
+                {/* Glowing Backdrop behind bottle */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[100px] -z-10" />
+                
+                <div className="relative w-full h-[600px] flex items-center justify-center">
+                   {/* Make sure to import Image from 'next/image' at the top of the file! */}
+                   <img
+                     src="/minerals.webp" 
+                     alt="Ionic Trace Minerals Bottle"
+                     className="w-auto h-full max-h-[550px] object-contain drop-shadow-[0_0_50px_rgba(0,229,255,0.2)] hover:scale-105 transition-transform duration-700 ease-out"
+                   />
+                   
+                   {/* Floating "Badge" Card */}
+                   <div className="absolute bottom-20 -left-10 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl shadow-2xl animate-pulse-slow">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-primary font-bold">
+                          <Zap className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <p className="text-white font-bold text-sm">Ionic Charge</p>
+                          <p className="text-accent text-xs">Bio-Active instantly</p>
+                        </div>
+                      </div>
+                   </div>
+                </div>
+              </FadeIn>
+            </div>
+
           </div>
         </div>
       </section>
