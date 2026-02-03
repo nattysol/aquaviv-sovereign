@@ -45,7 +45,7 @@ export function Navbar() {
               Sign In
             </button>
             <Link href="/product" className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-[#002a55] transition-all hover:shadow-lg hover:shadow-primary/20">
-              <span>Shop Ritual</span>
+              <span>Shop Minerals</span>
               <ShoppingBag className="w-4 h-4" />
             </Link>
           </div>

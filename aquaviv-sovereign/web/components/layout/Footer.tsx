@@ -14,7 +14,7 @@ export function Footer() {
               <span className="text-xl font-bold tracking-tight">aquaViv</span>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed">
-              Restoring cellular sovereignty through clinical-grade mineral hydration.
+              Restoring cellular hydration through clinical-grade minerals.
             </p>
             <div className="flex gap-4 pt-2">
               <a href="#" className="text-slate-400 hover:text-accent transition-colors"><Twitter className="w-5 h-5" /></a>
@@ -62,7 +62,7 @@ export function Footer() {
         </div>
         
         <div className="mt-16 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-          <p>© 2024 aquaViv Sovereign. All rights reserved.</p>
+          <p>© 2026 aquaViv. All rights reserved.</p>
           <div className="flex gap-6">
             <Link href="#" className="hover:text-slate-300">Privacy Policy</Link>
             <Link href="#" className="hover:text-slate-300">Terms of Service</Link>

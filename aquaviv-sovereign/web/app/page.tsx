@@ -44,7 +44,7 @@ export default function Home() {
               <FadeIn delay={0.4}>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link href="/products/aquaviv-mineral-drops" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-primary bg-accent rounded-full hover:bg-white transition-all hover:scale-105 shadow-[0_0_20px_rgba(0,229,255,0.3)]">
-                    Shop The Ritual
+                    Shop The Minerals
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
                   <Link href="/affiliate/join" className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white border border-white/20 rounded-full hover:bg-white/10 transition-all">
@@ -142,9 +142,9 @@ export default function Home() {
                 </div>
                 {/* Updated Title */}
                 <h3 className="text-xl font-bold text-primary mb-3">1,300°C Alchemical Purity</h3>
-                {/* Updated Description based on [cite: 478, 521] */}
+             
                 <p className="text-slate-500 leading-relaxed">
-                  Roasted 9 times and melted at 1,300°C. This ancient process eliminates all heavy metals and toxins while synthesizing bio-active sulfur.
+                  Roasted and melted at 1,300°C. This ancient process eliminates all heavy metals and toxins while synthesizing bio-active sulfur.
                 </p>
               </div>
             </FadeIn>
