@@ -14,6 +14,12 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+  name: 'store',
+  title: 'Shopify Connect',
+  type: 'shopify.product', // <--- This triggers the specialized selector
+  description: 'Select the Shopify product to sync price and inventory.',
+}),
+    defineField({
       name: 'slug',
       title: 'URL Slug',
       type: 'slug',
