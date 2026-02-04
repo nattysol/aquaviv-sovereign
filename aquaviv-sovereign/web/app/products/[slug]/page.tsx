@@ -4,11 +4,9 @@ import { PortableText } from '@portabletext/react';
 import { FadeIn } from '@/components/ui/FadeIn';
 import { AddToCartButton } from '@/components/product/AddToCartButton';
 import { Star, ShieldCheck, Zap, Droplets } from 'lucide-react';
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
-// 1. THE QUERY
-// We explicitly fetch the 'gid' (Shopify Global ID) from the synced store data
+// 1. QUERY: Fetches Content + Manual Shopify Data
 const PRODUCT_QUERY = `*[_type == "product" && slug.current == $slug][0] {
   title,
   "slug": slug.current,
@@ -18,7 +16,7 @@ const PRODUCT_QUERY = `*[_type == "product" && slug.current == $slug][0] {
   mainImage,
   body, 
   
-  // Updated Manual Query
+  // Manual Data from Sanity
   store {
     variantID,
     price,
@@ -31,20 +29,17 @@ interface PageProps {
 }
 
 export default async function ProductPage({ params }: PageProps) {
-  // 1. Await params (Required for Next.js 15)
   const { slug } = await params;
-
-  // 2. Fetch Data
   const product = await client.fetch(PRODUCT_QUERY, { slug });
 
   if (!product) {
     return notFound();
   }
 
-  // Updated Data Extraction
+  // 2. Logic: Use Manual Data if present, otherwise fallback to basic Sanity data
   const variantId = product.store?.variantID;
   const isAvailable = product.store?.isAvailable ?? true;
-  const price = product.store?.price || product.price;
+  const displayPrice = product.store?.price || product.price;
 
   return (
     <main className="min-h-screen bg-surface-light pt-24 pb-20">
@@ -52,7 +47,7 @@ export default async function ProductPage({ params }: PageProps) {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           
-          {/* LEFT: Product Image (Gallery) */}
+          {/* LEFT: Product Image (Restored High-End Look) */}
           <FadeIn delay={0.1} className="relative aspect-square bg-white rounded-3xl border border-slate-100 p-12 flex items-center justify-center overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-tr from-slate-50 to-transparent opacity-50" />
             
@@ -74,6 +69,7 @@ export default async function ProductPage({ params }: PageProps) {
           {/* RIGHT: Product Details */}
           <div className="pt-8">
             <FadeIn delay={0.2}>
+              {/* Review Stars */}
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex text-amber-400">
                   <Star className="w-4 h-4 fill-current" />
@@ -90,14 +86,14 @@ export default async function ProductPage({ params }: PageProps) {
               </h1>
               
               <p className="text-lg text-slate-500 font-medium mb-8 leading-relaxed max-w-lg">
-                {product.tagline}
+                {product.tagline || product.description}
               </p>
 
               <div className="h-px bg-slate-200 w-full mb-8" />
 
               <div className="flex items-end gap-4 mb-8">
                 <span className="text-4xl font-bold text-slate-900">
-                  ${Number(price).toFixed(2)}
+                  ${Number(displayPrice).toFixed(2)}
                 </span>
                 <span className="text-sm font-bold text-emerald-600 mb-1.5 bg-emerald-50 px-2 py-1 rounded">
                   In Stock & Ready to Ship
@@ -110,8 +106,7 @@ export default async function ProductPage({ params }: PageProps) {
                    <AddToCartButton variantId={variantId} available={isAvailable} />
                 ) : (
                    <div className="p-4 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100">
-                     <strong>Configuration Error:</strong> No Shopify Variant ID found. <br/>
-                     Please sync this product in Sanity Studio.
+                     <strong>Setup Required:</strong> Paste the Shopify Variant GID in Sanity.
                    </div>
                 )}
                 <p className="text-center text-xs text-slate-400 mt-3">
@@ -119,7 +114,7 @@ export default async function ProductPage({ params }: PageProps) {
                 </p>
               </div>
 
-              {/* FEATURES */}
+              {/* FEATURES GRID */}
               <div className="grid grid-cols-2 gap-4 mb-10">
                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-100">
                     <Zap className="w-5 h-5 text-accent shrink-0" />
@@ -137,7 +132,7 @@ export default async function ProductPage({ params }: PageProps) {
                  </div>
               </div>
 
-              {/* DESCRIPTION (Portable Text) */}
+              {/* RICH TEXT DESCRIPTION */}
               <div className="prose prose-slate prose-lg text-slate-600">
                 {product.body ? (
                   <PortableText value={product.body} />
