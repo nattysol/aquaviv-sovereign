@@ -31,6 +31,7 @@ export default function RootLayout({
         {/* The Footer */}
         <Footer />
         <MobileBottomNav /> {/* <--- ADD THIS LINE HERE */}
+        <CartDrawer /> {/* <--- ADD THE CART DRAWER HERE */}
         </CartProvider>
       </body>
     </html>
