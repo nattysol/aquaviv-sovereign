@@ -2,20 +2,18 @@
 
 import { useCart } from '@/components/providers/CartContext';
 import { FadeIn } from '@/components/ui/FadeIn';
-import { Minus, Plus, Trash2, ArrowRight, ShieldCheck, Lock } from 'lucide-react';
-import Image from 'next/image';
+import { Trash2, ArrowRight, Lock, ShoppingBag } from 'lucide-react'; // Added ShoppingBag import
 import Link from 'next/link';
-import { useState } from 'react';
 
 export default function CartPage() {
-  const { cart, isLoading } = useCart();
-  const [isUpdating, setIsUpdating] = useState(false);
+  const { cart, isLoading, removeItem } = useCart(); // Destructure removeItem
 
   // Helper: Format Price
   const formatPrice = (amount: string, currency: string) => 
     new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(parseFloat(amount));
 
-  if (isLoading) {
+  // Loading State
+  if (isLoading && !cart) {
     return (
       <div className="min-h-screen bg-surface-light flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
@@ -23,13 +21,13 @@ export default function CartPage() {
     );
   }
 
-  // EMPTY STATE
+  // Empty State
   if (!cart || cart.lines.edges.length === 0) {
     return (
       <div className="min-h-screen bg-surface-light flex items-center justify-center p-4">
         <FadeIn className="text-center max-w-md">
           <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <ShoppingBagIcon className="w-8 h-8 text-slate-400" />
+            <ShoppingBag className="w-8 h-8 text-slate-400" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Your Ritual is Empty</h1>
           <p className="text-slate-500 mb-8">Begin your path to sovereignty by selecting your protocol.</p>
@@ -59,7 +57,7 @@ export default function CartPage() {
                    {node.merchandise.image && (
                      <img 
                        src={node.merchandise.image.url} 
-                       alt={node.merchandise.product.title} 
+                       alt={node.merchandise.image.altText || node.merchandise.product.title} 
                        className="w-full h-full object-contain p-2"
                      />
                    )}
@@ -75,10 +73,19 @@ export default function CartPage() {
                       {formatPrice(node.cost.totalAmount.amount, node.cost.totalAmount.currencyCode)}
                     </p>
                     
-                    {/* Quantity Controls (Visual Only for now - Logic requires API update) */}
                     <div className="flex items-center gap-3 bg-slate-50 rounded-lg px-3 py-1 border border-slate-100">
                        <span className="text-xs font-bold text-slate-500">Qty: {node.quantity}</span>
                     </div>
+
+                    {/* DELETE BUTTON */}
+                    <button 
+                      onClick={() => removeItem(node.id)}
+                      disabled={isLoading}
+                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-auto sm:ml-0"
+                      title="Remove from cart"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </div>
                 </div>
 
@@ -127,10 +134,4 @@ export default function CartPage() {
       </div>
     </main>
   );
-}
-
-function ShoppingBagIcon(props: any) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-  )
 }

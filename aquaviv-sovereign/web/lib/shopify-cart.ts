@@ -115,3 +115,23 @@ export async function getCart(cartId: string) {
   const response = await shopifyFetch({ query, variables: { cartId } });
   return response.data.cart;
 }
+// 4. Remove Item from Cart
+export async function removeFromCartAPI(cartId: string, lineIds: string[]) {
+  const query = `
+    mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+      cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+        cart {
+          ...cartDetails
+        }
+      }
+    }
+    ${CART_FRAGMENT}
+  `;
+
+  const response = await shopifyFetch({
+    query,
+    variables: { cartId, lineIds },
+  });
+
+  return response.data.cartLinesRemove.cart;
+}

@@ -1,12 +1,13 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { createCart, addToCartAPI, getCart } from '@/lib/shopify-cart';
+import { createCart, addToCartAPI, getCart, removeFromCartAPI } from '@/lib/shopify-cart';
 
 type CartContextType = {
   cart: any | null;
   itemCount: number;
   addToCart: (variantId: string, quantity: number) => Promise<void>;
+  removeItem: (lineId: string) => Promise<void>; // <--- New capability
   isCartOpen: boolean;
   toggleCart: () => void;
   isLoading: boolean;
@@ -19,16 +20,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Load cart from LocalStorage on mount
+  // 1. Load cart from LocalStorage on mount
   useEffect(() => {
     const initializeCart = async () => {
       const storedCartId = localStorage.getItem('aquaviv_cart_id');
       if (storedCartId) {
+        // Fetch fresh data from Shopify to ensure price/stock is accurate
         const existingCart = await getCart(storedCartId);
         if (existingCart) {
           setCart(existingCart);
         } else {
-          // If stored ID is invalid (expired), clear it
+          // If Shopify returns null (expired), clear local storage
           localStorage.removeItem('aquaviv_cart_id');
         }
       }
@@ -36,23 +38,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     initializeCart();
   }, []);
 
+  // 2. Add Item
   async function addToCart(variantId: string, quantity: number) {
     setIsLoading(true);
     try {
       let newCart;
       
-      // A. If no cart exists, create one
+      // A. Create new cart if none exists
       if (!cart?.id) {
         newCart = await createCart(variantId, quantity);
         localStorage.setItem('aquaviv_cart_id', newCart.id);
       } 
-      // B. If cart exists, add to it
+      // B. Update existing cart
       else {
         newCart = await addToCartAPI(cart.id, variantId, quantity);
       }
 
       setCart(newCart);
-      setIsCartOpen(true); // Open drawer/feedback
+      setIsCartOpen(true); 
     } catch (error) {
       console.error("Failed to add to cart:", error);
     } finally {
@@ -60,11 +63,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // 3. Remove Item
+  async function removeItem(lineId: string) {
+    if (!cart?.id) return;
+    
+    setIsLoading(true);
+    try {
+      // Shopify requires the Cart ID and the Line Item ID to remove it
+      const newCart = await removeFromCartAPI(cart.id, [lineId]);
+      setCart(newCart);
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   const toggleCart = () => setIsCartOpen(!isCartOpen);
+  
+  // Calculate total items safely
   const itemCount = cart?.totalQuantity || 0;
 
   return (
-    <CartContext.Provider value={{ cart, itemCount, addToCart, isCartOpen, toggleCart, isLoading }}>
+    <CartContext.Provider value={{ cart, itemCount, addToCart, removeItem, isCartOpen, toggleCart, isLoading }}>
       {children}
     </CartContext.Provider>
   );
