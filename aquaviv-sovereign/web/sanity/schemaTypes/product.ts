@@ -13,12 +13,30 @@ export default defineType({
       type: 'string',
       validation: (rule) => rule.required(),
     }),
-    defineField({
-  name: 'store',
-  title: 'Shopify Connect',
-  type: 'shopify.product', // <--- This triggers the specialized selector
-  description: 'Select the Shopify product to sync price and inventory.',
-}),
+   defineField({
+      name: 'store',
+      title: 'Shopify Connection',
+      type: 'object',
+      fields: [
+        {
+          name: 'variantID',
+          title: 'Variant GID',
+          type: 'string',
+          description: 'Paste the Shopify Global ID here (e.g. gid://shopify/ProductVariant/123456...)',
+        },
+        {
+          name: 'price',
+          title: 'Price',
+          type: 'number',
+        },
+        {
+          name: 'isAvailable',
+          title: 'In Stock?',
+          type: 'boolean',
+          initialValue: true,
+        }
+      ]
+    }),
     defineField({
       name: 'slug',
       title: 'URL Slug',
