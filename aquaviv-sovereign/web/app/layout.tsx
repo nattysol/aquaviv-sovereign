@@ -4,6 +4,7 @@ import { Navbar } from "@/components/layout/Navbar"; // Import Navbar
 import { Footer } from "@/components/layout/Footer"; // Import Footer
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { CartProvider } from '@/components/providers/CartContext'; // <--- Import this
+import { CartDrawer } from '@/components/cart/CartDrawer'; // <--- DO YOU HAVE THIS?
 
 export const metadata: Metadata = {
   title: "aquaViv Sovereign",
