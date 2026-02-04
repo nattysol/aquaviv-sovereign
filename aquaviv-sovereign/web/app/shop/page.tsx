@@ -1,103 +1,245 @@
 import { client } from '@/sanity/lib/client';
 import { urlFor } from '@/sanity/lib/image';
-import Link from 'next/link';
+import { PortableText } from '@portabletext/react';
 import { FadeIn } from '@/components/ui/FadeIn';
-import { ArrowRight, Star } from 'lucide-react';
+import { AddToCartButton } from '@/components/product/AddToCartButton';
+import { Star, ShieldCheck, Zap, Droplets, ChevronDown, FlaskConical, Leaf, Clock } from 'lucide-react';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
-// 1. Fetch ALL products
-const ALL_PRODUCTS_QUERY = `*[_type == "product"] | order(price asc) {
+// 1. ADVANCED QUERY: Fetches Product + Related Items
+const PRODUCT_QUERY = `*[_type == "product" && slug.current == $slug][0] {
   title,
-  slug,
+  "slug": slug.current,
   tagline,
+  description,
   price,
-  mainImage
+  mainImage,
+  body, 
+  
+  // Shopify Sync Data
+  store {
+    variants[]-> {
+      store {
+        id,
+        gid,
+        price,
+        inventory {
+          isAvailable
+        }
+      }
+    }
+  },
+
+  // "Complete the Stack" (Fetch 3 other products)
+  "related": *[_type == "product" && slug.current != $slug][0..2] {
+    title,
+    "slug": slug.current,
+    price,
+    mainImage,
+    tagline
+  }
 }`;
 
-export default async function ShopPage() {
-  const products = await client.fetch(ALL_PRODUCTS_QUERY);
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default async function ProductPage({ params }: PageProps) {
+  const { slug } = await params;
+  const product = await client.fetch(PRODUCT_QUERY, { slug });
+
+  if (!product) return notFound();
+
+  // Extract Variant Data
+  const firstVariant = product.store?.variants?.[0]?.store;
+  const variantId = firstVariant?.gid;
+  const isAvailable = firstVariant?.inventory?.isAvailable ?? true;
+  const price = firstVariant?.price || product.price;
 
   return (
     <main className="min-h-screen bg-surface-light">
       
-      {/* 1. SHOP HERO */}
-      <section className="bg-surface-dark text-white pt-32 pb-20 relative overflow-hidden">
-        {/* Abstract Background */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary rounded-full blur-[100px] opacity-20 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <FadeIn>
-            <span className="text-accent font-bold tracking-widest uppercase text-xs mb-4 block">
-              The Collection
-            </span>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Cellular Hydration
-            </h1>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
-              Targeted protocols for energy, clarity, and cellular restoration. 
-              Each formula is engineered for maximum bioavailability.
-            </p>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* 2. PRODUCT GRID */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+      {/* SECTION 1: HERO & BUY BOX */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
           
-          {products.map((product: any, i: number) => (
-            <FadeIn key={product.slug.current} delay={i * 0.1}>
-              <Link href={`/products/${product.slug.current}`} className="group block h-full">
-                <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 hover:shadow-xl hover:border-accent/30 transition-all duration-500 h-full flex flex-col">
-                  
-                  {/* Image Area */}
-                  <div className="h-[350px] bg-gradient-to-b from-white to-slate-50 flex items-center justify-center p-8 relative overflow-hidden">
-                    {product.mainImage && (
-                      <img 
-                        src={urlFor(product.mainImage).width(600).url()} 
-                        alt={product.title}
-                        className="w-full h-full object-contain drop-shadow-lg transition-transform duration-700 group-hover:scale-110"
-                      />
-                    )}
-                    
-                    {/* Hover Badge */}
-                    <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-xs font-bold text-primary opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                      View Products
-                    </div>
-                  </div>
+          {/* LEFT: Sticky Gallery */}
+          <div className="lg:col-span-7 lg:sticky lg:top-32">
+            <FadeIn className="bg-white rounded-[3rem] border border-slate-100 p-12 lg:p-20 relative overflow-hidden group shadow-xl shadow-slate-200/40">
+              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-br from-blue-50 to-transparent rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2" />
+              
+              {product.mainImage && (
+                <img 
+                  src={urlFor(product.mainImage).width(1000).url()} 
+                  alt={product.title}
+                  className="relative z-10 w-full h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.1)] transition-transform duration-700 group-hover:scale-105"
+                />
+              )}
 
-                  {/* Content Area */}
-                  <div className="p-8 flex flex-col flex-1">
-                    <div className="flex justify-between items-start mb-2">
-                       <h3 className="text-xl font-bold text-slate-900 group-hover:text-primary transition-colors">
-                         {product.title}
-                       </h3>
-                       <div className="flex items-center gap-1 text-amber-400 text-xs font-bold bg-amber-50 px-2 py-1 rounded">
-                         <Star className="w-3 h-3 fill-current" /> 4.9
-                       </div>
-                    </div>
-                    
-                    <p className="text-slate-500 text-sm mb-6 flex-1">
-                      {product.tagline}
-                    </p>
-
-                    <div className="flex items-center justify-between border-t border-slate-50 pt-4 mt-auto">
-                      <span className="text-lg font-bold text-slate-900">
-                        ${product.price?.toFixed(2)}
-                      </span>
-                      <span className="text-primary text-sm font-bold flex items-center group-hover:gap-2 transition-all">
-                        Shop Now <ArrowRight className="w-4 h-4 ml-1" />
-                      </span>
-                    </div>
-                  </div>
-
-                </div>
-              </Link>
+              {/* Float Badge */}
+              <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur border border-slate-100 px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3">
+                 <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+                    <ShieldCheck size={20} />
+                 </div>
+                 <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Purity Grade</p>
+                    <p className="text-sm font-bold text-slate-900">Clinical / Verified</p>
+                 </div>
+              </div>
             </FadeIn>
-          ))}
+          </div>
 
+          {/* RIGHT: The Protocol Details */}
+          <div className="lg:col-span-5 pt-4">
+            <FadeIn delay={0.2}>
+              {/* Header */}
+              <div className="mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="bg-accent/10 text-accent text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                    Sovereign Series
+                  </span>
+                  <div className="flex text-amber-400 gap-0.5">
+                    {[1,2,3,4,5].map(i => <Star key={i} size={14} fill="currentColor" />)}
+                  </div>
+                  <span className="text-xs font-bold text-slate-400 ml-1">4.9/5.0</span>
+                </div>
+                
+                <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4 leading-none">
+                  {product.title}
+                </h1>
+                <p className="text-lg text-slate-500 font-medium leading-relaxed">
+                  {product.tagline}
+                </p>
+              </div>
+
+              {/* Price & Stock */}
+              <div className="flex items-end gap-6 mb-8 pb-8 border-b border-slate-100">
+                <div>
+                   <p className="text-xs text-slate-400 font-bold mb-1">PRICE</p>
+                   <div className="text-4xl font-bold text-slate-900">${Number(price).toFixed(2)}</div>
+                </div>
+                <div className="mb-2">
+                   {isAvailable ? (
+                     <span className="flex items-center gap-2 text-emerald-600 text-sm font-bold bg-emerald-50 px-3 py-1.5 rounded-full">
+                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                       In Stock
+                     </span>
+                   ) : (
+                     <span className="text-red-500 font-bold text-sm">Sold Out</span>
+                   )}
+                </div>
+              </div>
+
+              {/* Buy Button */}
+              <div className="mb-10">
+                {variantId ? (
+                   <AddToCartButton variantId={variantId} available={isAvailable} />
+                ) : (
+                   <div className="p-3 bg-red-50 text-red-600 text-xs rounded border border-red-100">Setup Required: Sync Sanity & Shopify</div>
+                )}
+                <div className="flex justify-center gap-6 mt-4">
+                   <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <Clock size={14} /> Ships within 24h
+                   </div>
+                   <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <ShieldCheck size={14} /> 30-Day Guarantee
+                   </div>
+                </div>
+              </div>
+
+              {/* Information Accordions (Static for now, can be dynamic later) */}
+              <div className="space-y-4">
+                <AccordionItem title="The Science" icon={<FlaskConical size={18} />}>
+                  <p className="text-slate-500 text-sm leading-relaxed">
+                    Engineered for maximum bioavailability. Unlike generic supplements, our ionic formulation bypasses the digestive bottleneck, allowing for immediate cellular uptake. Verified by 3rd party mass spectrometry.
+                  </p>
+                </AccordionItem>
+                <AccordionItem title="Active Ingredients" icon={<Leaf size={18} />}>
+                  <p className="text-slate-500 text-sm leading-relaxed mb-2">
+                    <strong>Primary Matrix:</strong> Magnesium, Chloride, Sodium, Potassium.
+                  </p>
+                  <p className="text-slate-500 text-sm leading-relaxed">
+                    <strong>Trace Elements:</strong> Boron, Lithium, Zinc, and 68+ primordial minerals sourced from the Great Salt Lake.
+                  </p>
+                </AccordionItem>
+                <AccordionItem title="Ritual Protocol" icon={<Zap size={18} />}>
+                   <ul className="list-disc pl-5 text-slate-500 text-sm space-y-1">
+                      <li><strong>Morning:</strong> 10 drops in 16oz water upon waking.</li>
+                      <li><strong>Training:</strong> 10 drops pre-workout for electrolyte stability.</li>
+                      <li><strong>Evening:</strong> 5 drops to aid recovery and sleep architecture.</li>
+                   </ul>
+                </AccordionItem>
+              </div>
+
+            </FadeIn>
+          </div>
         </div>
+      </div>
+
+      {/* SECTION 2: DETAILED DESCRIPTION */}
+      <section className="bg-white border-t border-slate-100 py-20">
+         <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-2xl font-bold mb-8 text-center">Clinical Analysis</h2>
+            <div className="prose prose-slate prose-lg mx-auto text-slate-600">
+              {product.body ? <PortableText value={product.body} /> : <p>{product.description}</p>}
+            </div>
+         </div>
       </section>
+
+      {/* SECTION 3: COMPLETE THE STACK (Upsell) */}
+      {product.related && product.related.length > 0 && (
+        <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="flex justify-between items-end mb-10">
+              <div>
+                <h2 className="text-3xl font-black text-slate-900">Complete The Ritual</h2>
+                <p className="text-slate-500 mt-2">Synergistic compounds to amplify your results.</p>
+              </div>
+              <Link href="/shop" className="text-primary font-bold hover:underline">View All</Link>
+           </div>
+
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {product.related.map((item: any) => (
+                <Link key={item.slug} href={`/products/${item.slug}`} className="group block">
+                   <div className="bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-xl hover:border-accent/30 transition-all">
+                      <div className="h-48 bg-slate-50 rounded-xl mb-6 relative flex items-center justify-center overflow-hidden">
+                         {item.mainImage && (
+                            <img src={urlFor(item.mainImage).width(400).url()} className="object-contain h-full p-4 group-hover:scale-110 transition-transform" alt={item.title} />
+                         )}
+                      </div>
+                      <h3 className="font-bold text-lg text-slate-900 mb-1">{item.title}</h3>
+                      <p className="text-sm text-slate-500 mb-4 line-clamp-2">{item.tagline}</p>
+                      <div className="flex items-center justify-between">
+                         <span className="font-bold text-slate-900">${item.price}</span>
+                         <span className="text-accent text-sm font-bold group-hover:underline">View Protocol</span>
+                      </div>
+                   </div>
+                </Link>
+              ))}
+           </div>
+        </section>
+      )}
 
     </main>
+  );
+}
+
+// Helper: Simple CSS-only Accordion Details
+function AccordionItem({ title, icon, children }: { title: string, icon: any, children: React.ReactNode }) {
+  return (
+    <details className="group border border-slate-200 rounded-xl overflow-hidden bg-white open:border-accent/50 transition-colors">
+      <summary className="flex items-center justify-between p-4 cursor-pointer select-none bg-slate-50 group-open:bg-white transition-colors">
+        <div className="flex items-center gap-3 font-bold text-slate-700 group-open:text-accent">
+          {icon}
+          <span>{title}</span>
+        </div>
+        <ChevronDown className="w-5 h-5 text-slate-400 transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="p-4 pt-0 text-slate-600 animate-in slide-in-from-top-2">
+        <div className="pt-4 border-t border-slate-100">
+           {children}
+        </div>
+      </div>
+    </details>
   );
 }
