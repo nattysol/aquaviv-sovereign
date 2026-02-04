@@ -45,7 +45,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 // --- HELPER: SHOPIFY FETCH ---
 // (We keep this inline so this file is self-contained)
 const SHOPIFY_STORE_DOMAIN = 'aquaviv.myshopify.com';
-const SHOPIFY_STOREFRONT_ACCESS_TOKEN = '114b740702b85df1a1369f4c3a2512f4'; // Public token
+const SHOPIFY_STOREFRONT_ACCESS_TOKEN = 'a9c03eaeb3b88079ca5af9952f85ac0c'; // Public token
 
 async function shopifyFetch({ query, variables = {} }: { query: string; variables?: any }) {
   const endpoint = `https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`;
