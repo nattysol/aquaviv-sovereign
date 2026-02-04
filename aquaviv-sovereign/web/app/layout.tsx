@@ -3,6 +3,7 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar"; // Import Navbar
 import { Footer } from "@/components/layout/Footer"; // Import Footer
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
+import { CartProvider } from '@/components/providers/CartContext'; // <--- Import this
 
 export const metadata: Metadata = {
   title: "aquaViv Sovereign",
@@ -17,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased min-h-screen flex flex-col">
+        <CartProvider> {/* <--- WRAP EVERYTHING INSIDE THIS */}
         {/* The Shell */}
         <Navbar />
         
@@ -28,6 +30,7 @@ export default function RootLayout({
         {/* The Footer */}
         <Footer />
         <MobileBottomNav /> {/* <--- ADD THIS LINE HERE */}
+        </CartProvider>
       </body>
     </html>
   );

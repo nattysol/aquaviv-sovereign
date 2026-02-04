@@ -6,10 +6,12 @@ import { Home, ShoppingCart, User, Search, Menu, X } from 'lucide-react'; // Cha
 import { useState } from 'react';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useCart } from '@/components/providers/CartContext'; // <--- IMPORT HOOK
 
 export function MobileBottomNav() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { itemCount } = useCart(); // <--- GRAB THE COUNT
 
   // Helper to check active state
   const isActive = (path: string) => pathname === path;
@@ -25,13 +27,17 @@ export function MobileBottomNav() {
           <NavItem href="/" icon={<Home size={22} />} active={isActive('/')} label="Home" />
           <NavItem href="/shop" icon={<Search size={22} />} active={isActive('/shop')} label="Shop" />
           
-          {/* CENTER ACTION: The Cart */}
+         {/* CENTER ACTION: DYNAMIC CART */}
           <Link href="/cart" className="relative -top-8 group">
             <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,180,216,0.6)] border-[6px] border-surface-dark text-primary transition-transform group-hover:scale-110">
               <ShoppingCart size={26} fill="currentColor" className="relative -left-0.5" />
               
-              {/* Optional: Mock Notification Dot (To show it's live) */}
-              <span className="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full border-2 border-accent" />
+              {/* DYNAMIC BADGE: Only show if count > 0 */}
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-surface-dark flex items-center justify-center animate-in zoom-in">
+                  {itemCount}
+                </span>
+              )}
             </div>
           </Link>
 
