@@ -13,7 +13,7 @@ export default function ContactPage() {
           {/* Contact Info */}
           <div>
             <FadeIn>
-              <h1 className="text-4xl font-black text-slate-900 mb-6">Initiate Contact</h1>
+              <h1 className="text-4xl font-black text-slate-900 mb-6">Contact aquaViv</h1>
               <p className="text-lg text-slate-500 mb-10 leading-relaxed">
                 Whether you have questions about your protocol, wholesale inquiries, or partnership opportunities, our team is ready to assist.
               </p>
@@ -22,14 +22,14 @@ export default function ContactPage() {
                 <ContactItem 
                   icon={<Mail className="w-6 h-6 text-accent" />}
                   title="Support Protocol"
-                  content="support@aquaviv.com"
+                  content="hello@aquaviv.net"
                   sub="Response within 24 hours"
                 />
                 <ContactItem 
                   icon={<MessageSquare className="w-6 h-6 text-primary" />}
                   title="Wholesale & Partners"
-                  content="partners@aquaviv.com"
-                  sub="Join the Sovereign network"
+                  content="hello@aquaviv.net"
+                  sub="Join aquaViv network"
                 />
                 <ContactItem 
                   icon={<MapPin className="w-6 h-6 text-slate-900" />}
@@ -76,7 +76,7 @@ export default function ContactPage() {
                </div>
 
                <button className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-primary/20">
-                 Send Transmission
+                 Send Message
                </button>
              </form>
           </FadeIn>
