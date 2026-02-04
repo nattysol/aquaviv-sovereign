@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useCart } from '@/components/providers/CartContext'; // Using the Brain we built
+import { useCart } from '@/components/providers/CartContext'; // <--- Ensure this path is correct
 import { ShoppingBag, Loader2, Check } from 'lucide-react';
 
 interface ProductFormProps {
@@ -15,14 +15,14 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ basePrice, variantIds }: ProductFormProps) {
-  const { addToCart, isLoading } = useCart();
+  // 1. GET 'openCart' FROM THE CONTEXT
+  const { addToCart, openCart, isLoading } = useCart(); 
+  
   const [isAdding, setIsAdding] = useState(false);
   const [quantity, setQuantity] = useState<1 | 3 | 6>(1);
 
-  // --- EMERGENCY BYPASS ID ---
-  // If Sanity sends null, we use this known working ID so you can keep building.
+  // EMERGENCY BYPASS ID (Your working ID)
   const WORKING_ID = "gid://shopify/ProductVariant/42958057930818"; 
-  // ---------------------------
 
   const activeVariantId = 
     (quantity === 1 ? variantIds.bottle1 : 
@@ -31,15 +31,20 @@ export function ProductForm({ basePrice, variantIds }: ProductFormProps) {
 
   const handleAddToCart = async () => {
     setIsAdding(true);
-    // Add the specific variant ID to the cart
-    await addToCart(activeVariantId, 1); 
+    
+    // 2. ADD TO CART
+    await addToCart(activeVariantId, quantity); 
+    
+    // 3. OPEN THE CART DRAWER (Visual Feedback)
+    openCart(); 
+    
     setIsAdding(false);
   };
 
   return (
     <div className="space-y-6">
       
-      {/* 1. QUANTITY SELECTOR (The "Bundle" Logic) */}
+      {/* QUANTITY SELECTOR */}
       <div className="grid grid-cols-3 gap-3">
         <OptionButton 
           count={1} 
@@ -49,21 +54,21 @@ export function ProductForm({ basePrice, variantIds }: ProductFormProps) {
         />
         <OptionButton 
           count={3} 
-          price={basePrice * 3 * 0.9} // Mock 10% discount logic
+          price={basePrice * 3 * 0.9} 
           active={quantity === 3} 
           onClick={() => setQuantity(3)}
           badge="Save 10%" 
         />
         <OptionButton 
           count={6} 
-          price={basePrice * 6 * 0.8} // Mock 20% discount logic
+          price={basePrice * 6 * 0.8} 
           active={quantity === 6} 
           onClick={() => setQuantity(6)} 
           badge="Best Value"
         />
       </div>
 
-      {/* 2. ADD TO CART BUTTON */}
+      {/* ADD TO CART BUTTON */}
       <button
         onClick={handleAddToCart}
         disabled={isAdding || isLoading}
@@ -72,7 +77,7 @@ export function ProductForm({ basePrice, variantIds }: ProductFormProps) {
         {isAdding ? (
           <>
             <Loader2 className="w-5 h-5 animate-spin" />
-            <span>Adding to Ritual...</span>
+            <span>Adding...</span>
           </>
         ) : (
           <>
@@ -82,7 +87,6 @@ export function ProductForm({ basePrice, variantIds }: ProductFormProps) {
         )}
       </button>
 
-      {/* Trust Text */}
       <p className="text-center text-xs text-slate-400">
         30-Day Money Back Guarantee • Free Shipping over $100
       </p>
@@ -90,7 +94,6 @@ export function ProductForm({ basePrice, variantIds }: ProductFormProps) {
   );
 }
 
-// Helper: The selectable box
 function OptionButton({ count, price, active, onClick, badge }: any) {
   return (
     <button 
@@ -107,7 +110,7 @@ function OptionButton({ count, price, active, onClick, badge }: any) {
         </span>
       )}
       <div className="font-bold text-slate-900 text-lg">{count} Bottle{count > 1 && 's'}</div>
-      <div className="text-sm text-slate-500">${price.toFixed(0)}</div>
+      <div className="text-sm text-slate-500">${price?.toFixed(0) || '0'}</div>
       {active && <div className="absolute top-2 right-2 text-accent"><Check size={14} strokeWidth={4} /></div>}
     </button>
   );
