@@ -37,9 +37,9 @@ export function Footer() {
           <div>
             <h3 className="font-bold text-accent mb-4 uppercase tracking-wider text-xs">Company</h3>
             <ul className="space-y-3 text-sm text-slate-400">
-              <li><Link href="#" className="hover:text-white transition-colors">Our Science</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors">Our Science</Link></li>
               <li><Link href="/affiliate/join" className="hover:text-white transition-colors">Affiliate Program</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Contact</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
             </ul>
           </div>
 
