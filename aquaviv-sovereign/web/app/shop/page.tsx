@@ -30,7 +30,7 @@ export default async function ShopPage() {
               The Collection
             </span>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Sovereign Hydration
+              Cellular Hydration
             </h1>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
               Targeted protocols for energy, clarity, and cellular restoration. 
@@ -61,7 +61,7 @@ export default async function ShopPage() {
                     
                     {/* Hover Badge */}
                     <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-xs font-bold text-primary opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                      View Ritual
+                      View Products
                     </div>
                   </div>
 
