@@ -11,7 +11,8 @@ import { useCart } from '@/components/providers/CartContext'; // <--- IMPORT HOO
 export function MobileBottomNav() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { itemCount } = useCart(); // <--- GRAB THE COUNT
+  const { cart, openCart } = useCart();
+const itemCount = cart?.totalQuantity || 0;
 
   // Helper to check active state
   const isActive = (path: string) => pathname === path;
