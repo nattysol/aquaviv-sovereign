@@ -62,7 +62,7 @@ export default function AffiliateOnboarding() {
             
             <div className="pt-10 pb-6 px-8 sm:px-12 text-center border-b border-slate-50">
               <h1 className="text-primary text-3xl sm:text-4xl font-bold tracking-tight mb-3">
-                Join the Ritual
+                Join the aquaViv Affiliate Program
               </h1>
               <p className="text-slate-500 text-base sm:text-lg max-w-lg mx-auto leading-relaxed">
                 Partner with aquaViv to bring premium wellness technology to your community.

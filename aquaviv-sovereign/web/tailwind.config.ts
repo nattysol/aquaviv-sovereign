@@ -5,37 +5,36 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/**/*.{js,ts,jsx,tsx,mdx}", // Fallback for some project structures
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        // --- 1. Main Brand Identity (Public Site) ---
+        // --- 1. Main Brand Identity ---
         primary: {
-          DEFAULT: '#003366', // Deep Sea Blue (Main Text/Buttons)
+          DEFAULT: '#003366', // Deep Sea Blue (Unchanged)
           100: '#e6f0ff',
           200: '#99c2ff',
         },
         accent: {
-          DEFAULT: '#00e5ff', // Clinical Cyan (Highlights)
-          hover: '#00b8cc',
+          DEFAULT: '#00b4d8', // <--- UPDATED: Softer "Clinical Cerulean"
+          hover: '#0096c7',   // Darker shade for hover states
         },
         surface: {
-          light: '#f8fafc', // Very light grey/blue for backgrounds
-          dark: '#0f172a',  // Deep slate for dark sections
+          light: '#f8fafc', 
+          dark: '#0f172a',  
         },
         
-        // --- 2. Sovereign Dashboard Palette (New) ---
-        // These match your Stitch designs perfectly
+        // --- 2. Sovereign Dashboard Palette ---
         dashboard: {
-          dark: '#101822',   // The Command Center background
-          light: '#f6f7f8',  // The Light Mode background
-          card: '#1a3333',   // The "Ritual Archive" card color
-          border: '#234848', // The subtle green-teal borders
+          dark: '#101822',   
+          light: '#f6f7f8',  
+          card: '#1a3333',   
+          border: '#234848', 
         },
         sovereign: {
-          teal: '#13ecec',   // The glowing "Active" state
-          slate: '#1a3333',  // Dark surface for cards
+          teal: '#2dd4bf',   // <--- UPDATED: A softer teal for dashboard accents
+          slate: '#1a3333',  
         },
       },
       fontFamily: {
