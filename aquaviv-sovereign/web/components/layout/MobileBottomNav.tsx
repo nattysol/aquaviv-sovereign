@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ShoppingBag, User, Search, Menu, X } from 'lucide-react';
+import { Home, ShoppingCart, User, Search, Menu, X } from 'lucide-react'; // Changed ShoppingBag to ShoppingCart
 import { useState } from 'react';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -16,42 +16,46 @@ export function MobileBottomNav() {
 
   return (
     <>
-      {/* 1. THE BOTTOM DECK (Visible only on Mobile) */}
+      {/* 1. THE BOTTOM DECK */}
       <div className="md:hidden fixed bottom-6 left-4 right-4 z-50">
-        <div className="bg-surface-dark/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex justify-between items-center px-6 py-4">
+        
+        {/* Updated: /60 Opacity for glass effect + Heavy Blur */}
+        <div className="bg-surface-dark/60 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl flex justify-between items-center px-6 py-4 relative">
           
-          <NavItem href="/" icon={<Home size={20} />} active={isActive('/')} label="Home" />
-          <NavItem href="/shop" icon={<Search size={20} />} active={isActive('/shop')} label="Shop" />
+          <NavItem href="/" icon={<Home size={22} />} active={isActive('/')} label="Home" />
+          <NavItem href="/shop" icon={<Search size={22} />} active={isActive('/shop')} label="Shop" />
           
-          {/* Center Action Button (Cart) */}
-          <Link href="/cart" className="relative -top-8">
-            <div className="w-14 h-14 bg-accent rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,180,216,0.4)] border-4 border-surface-dark text-primary">
-              <ShoppingBag size={24} fill="currentColor" />
+          {/* CENTER ACTION: The Cart */}
+          <Link href="/cart" className="relative -top-8 group">
+            <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,180,216,0.6)] border-[6px] border-surface-dark text-primary transition-transform group-hover:scale-110">
+              <ShoppingCart size={26} fill="currentColor" className="relative -left-0.5" />
+              
+              {/* Optional: Mock Notification Dot (To show it's live) */}
+              <span className="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full border-2 border-accent" />
             </div>
           </Link>
 
-          <NavItem href="/account/dashboard" icon={<User size={20} />} active={isActive('/account/dashboard')} label="Account" />
+          <NavItem href="/account/dashboard" icon={<User size={22} />} active={isActive('/account/dashboard')} label="Account" />
           
-          {/* Menu Toggle */}
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={clsx("flex flex-col items-center gap-1 transition-colors", isMenuOpen ? "text-accent" : "text-slate-400")}
           >
-            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
             <span className="text-[10px] font-medium">Menu</span>
           </button>
 
         </div>
       </div>
 
-      {/* 2. THE FULL SCREEN MENU (When 'Menu' is clicked) */}
+      {/* 2. THE FULL SCREEN MENU */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="md:hidden fixed inset-0 z-40 bg-surface-dark/95 backdrop-blur-md pt-24 px-6 pb-32 overflow-y-auto"
+            className="md:hidden fixed inset-0 z-40 bg-surface-dark/95 backdrop-blur-xl pt-24 px-6 pb-32 overflow-y-auto"
           >
              <div className="flex flex-col gap-6">
                 <MenuLink href="/shop" label="The Collection" onClick={() => setIsMenuOpen(false)} />
@@ -70,7 +74,7 @@ export function MobileBottomNav() {
 
 function NavItem({ href, icon, active, label }: { href: string, icon: any, active: boolean, label: string }) {
   return (
-    <Link href={href} className={clsx("flex flex-col items-center gap-1 transition-colors", active ? "text-accent" : "text-slate-400")}>
+    <Link href={href} className={clsx("flex flex-col items-center gap-1 transition-colors", active ? "text-accent" : "text-slate-400 hover:text-slate-200")}>
       {icon}
       <span className="text-[10px] font-medium">{label}</span>
     </Link>
