@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar"; // Import Navbar
 import { Footer } from "@/components/layout/Footer"; // Import Footer
+import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 
 export const metadata: Metadata = {
   title: "aquaViv Sovereign",
@@ -26,6 +27,7 @@ export default function RootLayout({
 
         {/* The Footer */}
         <Footer />
+        <MobileBottomNav /> {/* <--- ADD THIS LINE HERE */}
       </body>
     </html>
   );

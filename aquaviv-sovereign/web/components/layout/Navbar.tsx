@@ -47,8 +47,8 @@ export function Navbar() {
               <User className="w-4 h-4" />
               Sign In
             </Link>
-            <Link href="/products/aquaviv-mineral-drops" className="flex items-center gap-2 bg-white text-primary px-5 py-2.5 rounded-full text-sm font-bold hover:bg-accent hover:text-white transition-all">
-              <span>Shop Ritual</span>
+            <Link href="/shop" className="flex items-center gap-2 bg-white text-primary px-5 py-2.5 rounded-full text-sm font-bold hover:bg-accent hover:text-white transition-all">
+              <span>Shop Our Store</span>
               <ShoppingBag className="w-4 h-4" />
             </Link>
           </div>
@@ -56,7 +56,7 @@ export function Navbar() {
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-slate-300 hover:text-white"
+            className="hidden text-slate-300 hover:text-white"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -77,8 +77,8 @@ export function Navbar() {
               Member Login
             </Link>
             <div className="h-px bg-white/10 my-2" />
-            <Link href="/products/aquaviv-mineral-drops" className="w-full bg-accent text-white py-3 rounded-lg text-center font-bold" onClick={() => setIsOpen(false)}>
-              Shop Ritual
+            <Link href="/shop" className="w-full bg-accent text-white py-3 rounded-lg text-center font-bold" onClick={() => setIsOpen(false)}>
+              Shop Our Store
             </Link>
           </div>
         </div>
