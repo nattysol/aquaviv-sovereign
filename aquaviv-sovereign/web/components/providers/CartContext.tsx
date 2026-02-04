@@ -1,15 +1,15 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { client } from '@/sanity/lib/client'; // We might use this later, but mainly we use Shopify fetch here
+import { createCart, addToCartAPI, getCart } from '@/lib/shopify-cart';
 
-// Define the shape of our Context
 type CartContextType = {
   cart: any | null;
   itemCount: number;
   addToCart: (variantId: string, quantity: number) => Promise<void>;
   isCartOpen: boolean;
   toggleCart: () => void;
+  isLoading: boolean;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -17,58 +17,61 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<any>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 1. Load Cart on Mount
+  // Load cart from LocalStorage on mount
   useEffect(() => {
-    const existingCartId = localStorage.getItem('aquaviv_cart_id');
-    if (existingCartId) {
-      fetchCart(existingCartId);
-    }
+    const initializeCart = async () => {
+      const storedCartId = localStorage.getItem('aquaviv_cart_id');
+      if (storedCartId) {
+        const existingCart = await getCart(storedCartId);
+        if (existingCart) {
+          setCart(existingCart);
+        } else {
+          // If stored ID is invalid (expired), clear it
+          localStorage.removeItem('aquaviv_cart_id');
+        }
+      }
+    };
+    initializeCart();
   }, []);
 
-  // 2. Helper: Fetch Cart Data from Shopify
-  async function fetchCart(cartId: string) {
-    // NOTE: In a real app, you would move this fetch to a Server Action to hide the token
-    // For this demo, we'll keep it simple or assume you have a /api/cart route.
-    // Let's stub the count for now to prove the UI works, 
-    // or if you have the shopify-buy SDK, you'd use it here.
-    
-    // Simulating a fetched cart for UI wiring:
-    // setCart({ lines: { edges: [] } }); 
-  }
-
-  // 3. Action: Add to Cart
   async function addToCart(variantId: string, quantity: number) {
-     // Logic to create cart or add line item
-     // For now, we will simulate a local state update so you see the number change immediately.
-     console.log("Adding to cart:", variantId);
-     
-     // MOCKING THE UPDATE (Replace with real Shopify mutation later)
-     setCart((prev: any) => {
-        const currentCount = prev?.totalQuantity || 0;
-        return { ...prev, totalQuantity: currentCount + quantity };
-     });
-     
-     setIsCartOpen(true);
+    setIsLoading(true);
+    try {
+      let newCart;
+      
+      // A. If no cart exists, create one
+      if (!cart?.id) {
+        newCart = await createCart(variantId, quantity);
+        localStorage.setItem('aquaviv_cart_id', newCart.id);
+      } 
+      // B. If cart exists, add to it
+      else {
+        newCart = await addToCartAPI(cart.id, variantId, quantity);
+      }
+
+      setCart(newCart);
+      setIsCartOpen(true); // Open drawer/feedback
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const toggleCart = () => setIsCartOpen(!isCartOpen);
-
-  // Calculate Count
   const itemCount = cart?.totalQuantity || 0;
 
   return (
-    <CartContext.Provider value={{ cart, itemCount, addToCart, isCartOpen, toggleCart }}>
+    <CartContext.Provider value={{ cart, itemCount, addToCart, isCartOpen, toggleCart, isLoading }}>
       {children}
     </CartContext.Provider>
   );
 }
 
-// Hook to use it easily
 export function useCart() {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
+  if (!context) throw new Error('useCart must be used within a CartProvider');
   return context;
 }
