@@ -18,18 +18,11 @@ const PRODUCT_QUERY = `*[_type == "product" && slug.current == $slug][0] {
   mainImage,
   body, 
   
-  // Fetching the Shopify Variant Data
+  // Updated Manual Query
   store {
-    variants[]-> {
-      store {
-        id,
-        gid,
-        price,
-        inventory {
-          isAvailable
-        }
-      }
-    }
+    variantID,
+    price,
+    isAvailable
   }
 }`;
 
@@ -48,12 +41,10 @@ export default async function ProductPage({ params }: PageProps) {
     return notFound();
   }
 
-  // 3. Extract Variant ID (The connection to Shopify)
-  // We default to the first variant found
-  const firstVariant = product.store?.variants?.[0]?.store;
-  const variantId = firstVariant?.gid;
-  const isAvailable = firstVariant?.inventory?.isAvailable ?? true;
-  const price = firstVariant?.price || product.price;
+  // Updated Data Extraction
+  const variantId = product.store?.variantID;
+  const isAvailable = product.store?.isAvailable ?? true;
+  const price = product.store?.price || product.price;
 
   return (
     <main className="min-h-screen bg-surface-light pt-24 pb-20">
