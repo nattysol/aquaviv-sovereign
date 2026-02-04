@@ -20,7 +20,7 @@ export function Navbar() {
               {/* Note: If your logo is dark blue, we invert it to white here for visibility */}
               <Image 
                 src="/logo.svg"
-                alt="aquaViv Sovereign"
+                alt="aquaViv"
                 fill
                 className="object-contain object-left brightness-0 invert" 
                 priority

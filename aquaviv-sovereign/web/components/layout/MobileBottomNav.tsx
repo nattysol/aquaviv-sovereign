@@ -68,7 +68,7 @@ export function MobileBottomNav() {
                 <MenuLink href="/products/aquaviv-mineral-drops" label="Mineral Drops" onClick={() => setIsMenuOpen(false)} />
                 <MenuLink href="/affiliate/join" label="Partner Program" onClick={() => setIsMenuOpen(false)} />
                 <div className="h-px bg-white/10 my-2" />
-                <MenuLink href="/account/dashboard" label="Sovereign Dashboard" onClick={() => setIsMenuOpen(false)} />
+                <MenuLink href="/account/dashboard" label="Customer Dashboard" onClick={() => setIsMenuOpen(false)} />
                 <MenuLink href="/account/login" label="Sign In" onClick={() => setIsMenuOpen(false)} />
              </div>
           </motion.div>

@@ -53,9 +53,9 @@ export function DashboardView({ customer }: DashboardProps) {
 
         <nav className="flex-1 px-4 space-y-2">
           <SidebarItem icon={<LayoutDashboard size={20} />} label="Command Center" isActive={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
-          <SidebarItem icon={<History size={20} />} label="Ritual Archive" isActive={activeTab === 'archive'} onClick={() => setActiveTab('archive')} />
-          <SidebarItem icon={<Settings size={20} />} label="Ritual Control" isActive={activeTab === 'ritual'} onClick={() => setActiveTab('ritual')} />
-          <SidebarItem icon={<Award size={20} />} label="Sovereign Rewards" isActive={false} onClick={() => {}} />
+          <SidebarItem icon={<History size={20} />} label="Archive" isActive={activeTab === 'archive'} onClick={() => setActiveTab('archive')} />
+          <SidebarItem icon={<Settings size={20} />} label="Control" isActive={activeTab === 'ritual'} onClick={() => setActiveTab('ritual')} />
+          <SidebarItem icon={<Award size={20} />} label="Rewards" isActive={false} onClick={() => {}} />
           <SidebarItem icon={<BookOpen size={20} />} label="The Library" isActive={activeTab === 'library'} onClick={() => setActiveTab('library')} />
         </nav>
 
@@ -152,7 +152,7 @@ export function DashboardView({ customer }: DashboardProps) {
                       </div>
                     ) : (
                       <div className="relative pl-12">
-                         <p className="text-sm text-slate-500">No orders yet. Start your ritual.</p>
+                         <p className="text-sm text-slate-500">No orders yet. Start your journey.</p>
                       </div>
                     )}
                   </div>
@@ -168,7 +168,7 @@ export function DashboardView({ customer }: DashboardProps) {
             <div className="flex justify-between items-end mb-8">
               <div>
                 <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">The Archive</h1>
-                <p className="text-slate-500 mt-2">Review your ritual history.</p>
+                <p className="text-slate-500 mt-2">Review your history.</p>
               </div>
             </div>
 
@@ -198,7 +198,7 @@ export function DashboardView({ customer }: DashboardProps) {
                       </div>
                       <div className="flex gap-3">
                         <button className="px-5 py-2.5 rounded-lg border border-primary text-primary font-bold text-sm hover:bg-primary/5">
-                          Reorder Ritual
+                          Reorder
                         </button>
                       </div>
                     </div>
@@ -208,7 +208,7 @@ export function DashboardView({ customer }: DashboardProps) {
               {customer.orders.edges.length === 0 && (
                 <div className="text-center py-12 text-slate-500">
                   <p>No orders found.</p>
-                  <Link href="/product" className="text-primary font-bold hover:underline mt-2 inline-block">Start your first ritual</Link>
+                  <Link href="/product" className="text-primary font-bold hover:underline mt-2 inline-block">Start your first order</Link>
                 </div>
               )}
             </div>

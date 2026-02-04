@@ -44,7 +44,7 @@ export function ProductForm({
     {
       id: '6-bottles',
       title: '6 Bottles',
-      subtitle: 'Complete Sovereignty',
+      subtitle: 'Complete Hydrsation',
       price: (basePrice * 6) * 0.75, 
       discount: 25,
       bestValue: true,
