@@ -47,7 +47,7 @@ export function AddToCartButton({ variantId, available }: { variantId: string, a
       ) : (
         <>
           <ShoppingBag className="w-5 h-5" />
-          <span>Add to Ritual</span>
+          <span>Add to Cart</span>
         </>
       )}
     </button>
