@@ -6,6 +6,7 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { CartProvider } from '@/components/providers/CartContext'; // <--- Import this
 import { CartDrawer } from '@/components/cart/CartDrawer'; // <--- DO YOU HAVE THIS?
 import { ReferralProvider } from '@/components/providers/ReferralContext'; // <--- Import this if you want referral context available globally  
+import { Suspense } from 'react'; // <--- 1. Import this
 
 export const metadata: Metadata = {
   title: "aquaViv Sovereign",
@@ -20,6 +21,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased min-h-screen flex flex-col">
+        {/* 2. Wrap the Provider in Suspense */}
+        <Suspense fallback={null}>
         <ReferralProvider><CartProvider> {/* <--- WRAP EVERYTHING INSIDE THIS */}
         {/* The Shell */}
         <Navbar />
@@ -35,6 +38,7 @@ export default function RootLayout({
         <CartDrawer /> {/* <--- ADD THE CART DRAWER HERE */}
         </CartProvider>
         </ReferralProvider>
+        </Suspense>
       </body>
     </html>
   );
