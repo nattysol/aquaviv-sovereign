@@ -8,10 +8,20 @@ export function AddToCartButton({ variantId, available }: { variantId: string, a
   const { addToCart, isLoading } = useCart();
   const [isAdding, setIsAdding] = useState(false);
 
+  // HELPER: Force the ID into the correct format right here
+  const cleanId = (id: string) => {
+    if (!id) return '';
+    if (id.startsWith('gid://')) return id;
+    return `gid://shopify/ProductVariant/${id}`;
+  }
+
   const handleAdd = async () => {
     if (!variantId) return;
     setIsAdding(true);
-    await addToCart(variantId, 1);
+    
+    // Use the cleaned ID
+    await addToCart(cleanId(variantId), 1);
+    
     setIsAdding(false);
   };
 
