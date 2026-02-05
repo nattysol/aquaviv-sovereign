@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Check, ArrowRight, Activity, Library, Award, Calendar } from 'lucide-react';
+import { ArrowRight, Activity, Library, Award, Calendar } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
 
 export default function LoginPage() {
@@ -23,8 +23,8 @@ export default function LoginPage() {
         className="relative hidden lg:flex lg:w-1/2 flex-col justify-center px-12 xl:px-24 bg-cover bg-center text-white"
         style={{ 
           backgroundImage: `linear-gradient(rgba(16, 34, 34, 0.8), rgba(16, 34, 34, 0.8)), url('/images/login-bg.webp')`,
-          // Note: Make sure to upload a 'login-bg.webp' to your /public/images folder
-          // Or use a placeholder color if image is missing: backgroundColor: '#102222'
+          // Fallback background color if image fails
+          backgroundColor: '#102222' 
         }}
       >
         {/* Logo */}
@@ -99,7 +99,8 @@ export default function LoginPage() {
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label htmlFor="password" classNa="block text-sm font-bold text-[#0d1b1b]">Password</label>
+                  {/* FIX IS HERE: Changed classNa to className */}
+                  <label htmlFor="password" className="block text-sm font-bold text-[#0d1b1b]">Password</label>
                   <Link href="/forgot-password" className="text-sm font-semibold text-[#13ecec] hover:underline">
                     Forgot Password?
                   </Link>
