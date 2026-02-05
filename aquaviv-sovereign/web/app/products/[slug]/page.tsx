@@ -4,6 +4,7 @@ import { ProductOptionSelector } from '@/components/product/ProductOptionSelecto
 import { Star, ChevronDown, Droplet, Activity, ShieldCheck, Leaf, FlaskConical, AlertCircle } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
 import { PortableText } from '@portabletext/react';
+import { RichText } from '@/components/ui/RichText';
 
 // 1. THE MASTER QUERY
 const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0] {
@@ -219,17 +220,22 @@ export default async function ProductPage({ params }: PageProps) {
       </div>
 
       {/* SECTION 2: THE DEEP DIVE (Rich Text) */}
-      {product.longDescription && (
-        <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
-          <div className="max-w-3xl mx-auto px-4">
-            <FadeIn>
-              <div className="prose prose-slate prose-lg mx-auto prose-headings:font-bold prose-headings:text-primary prose-p:text-slate-600 prose-li:text-slate-600 prose-strong:text-primary">
-                <PortableText value={product.longDescription} />
-              </div>
-            </FadeIn>
-          </div>
-        </section>
-      )}
+{product.longDescription && (
+  <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
+    <div className="max-w-3xl mx-auto px-4">
+      <FadeIn>
+        <div className="text-center mb-12">
+           <h2 className="text-sm font-bold text-accent uppercase tracking-widest mb-3">The Science</h2>
+           <p className="text-3xl font-bold text-slate-900">Deep Dive into the Source</p>
+        </div>
+
+        {/* The New Component */}
+        <RichText content={product.longDescription} />
+
+      </FadeIn>
+    </div>
+  </section>
+)}
 
       {/* SECTION 3: FAQs */}
       {product.faqs && product.faqs.length > 0 && (
