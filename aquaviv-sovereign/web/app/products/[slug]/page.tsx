@@ -131,7 +131,8 @@ export default async function ProductPage({ params }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-surface-light text-slate-900 pb-24 pt-20">
+    // ADDED: pt-24 lg:pt-28 (This pushes the content below the navbar)
+  <main className="min-h-screen bg-surface-light text-slate-900 pb-24 pt-24 lg:pt-28">
       
       {/* 1. KLAVIYO TRACKING (Invisible) */}
       <KlaviyoTracker product={product} />

@@ -48,7 +48,10 @@ export default function AffiliateLoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col lg:flex-row font-sans text-slate-900">
+   // ADDED: pt-20
+  <div className="flex min-h-screen w-full flex-col lg:flex-row font-sans text-slate-900 pt-20 lg:pt-0">
+     {/* Note: On Desktop (lg), the split-screen layout usually handles height well, 
+         but checking visually is best. Usually just mobile needs the pt-20. */}
       
       {/* LEFT SIDE: The "Sell" */}
       <div 

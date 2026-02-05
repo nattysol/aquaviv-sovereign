@@ -1,18 +1,13 @@
 import type { Metadata } from 'next';
 import { Manrope } from 'next/font/google';
 import './globals.css';
-import { Suspense } from 'react'; // <--- Fixes "Cannot find name Suspense"
+import { Suspense } from 'react';
 import Script from 'next/script';
 
-// Providers
-import { CartProvider } from '@/components/providers/CartContext'; // <--- Fixes "Cannot find CartProvider"
-import { ReferralProvider } from '@/components/providers/ReferralContext'; // <--- Fixes "Cannot find ReferralProvider"
-
-// Analytics
+import { CartProvider } from '@/components/providers/CartContext';
+import { ReferralProvider } from '@/components/providers/ReferralContext';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { KLAVIYO_SCRIPT_URL } from '@/lib/klaviyo';
-
-// Components
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 
@@ -31,25 +26,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={manrope.className}>
-        {/* Suspense is required when using useSearchParams (ReferralProvider) */}
         <Suspense fallback={null}>
           <ReferralProvider>
             <CartProvider>
               <Navbar />
-              <main className="min-h-screen pt-20">
+              
+              {/* REMOVED: pt-20. Now the Homepage Hero will sit perfectly at the top. */}
+              <main className="min-h-screen">
                 {children}
               </main>
-              <Footer />
 
-              {/* --- ANALYTICS SUITE --- */}
+              <Footer />
               <GoogleAnalytics />
-              
               <Script 
                 id="klaviyo-init"
                 strategy="afterInteractive"
                 src={KLAVIYO_SCRIPT_URL}
               />
-              
             </CartProvider>
           </ReferralProvider>
         </Suspense>
