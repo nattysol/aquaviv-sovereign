@@ -74,8 +74,8 @@ export default async function ProductPage({ params }: PageProps) {
   } 
   else if (product.shopifyId_1) {
     variants.push({ id: product.shopifyId_1, title: '1 Bottle', price: product.price, label: 'Starter' });
-    if (product.shopifyId_3) variants.push({ id: product.shopifyId_3, title: '3 Bottles', price: product.price * 3 * 0.85, label: 'Most Popular', savings: 'Save 15%' });
-    if (product.shopifyId_6) variants.push({ id: product.shopifyId_6, title: '6 Bottles', price: product.price * 6 * 0.75, label: 'Best Value', savings: 'Save 25%' });
+    if (product.shopifyId_3) variants.push({ id: product.shopifyId_3, title: '3 Bottles', price: product.price * 3 * 0.67, label: 'Most Popular', savings: 'Save 15%' });
+    if (product.shopifyId_6) variants.push({ id: product.shopifyId_6, title: '6 Bottles', price: product.price * 6 * 0.65, label: 'Best Value', savings: 'Save 25%' });
   }
   else if (product.store?.gid || product.store?.variantID) {
     variants.push({
