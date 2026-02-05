@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import Script from 'next/script';
 
 import { CartProvider } from '@/components/providers/CartContext';
+import { CartDrawer } from '@/components/cart/CartDrawer'; // <--- 1. Import This
 import { ReferralProvider } from '@/components/providers/ReferralContext';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { KLAVIYO_SCRIPT_URL } from '@/lib/klaviyo';
@@ -30,7 +31,8 @@ export default function RootLayout({
           <ReferralProvider>
             <CartProvider>
               <Navbar />
-              
+              {/* 2. PLACE THE DRAWER HERE (It is invisible until isOpen=true) */}
+              <CartDrawer />
               {/* REMOVED: pt-20. Now the Homepage Hero will sit perfectly at the top. */}
               <main className="min-h-screen">
                 {children}
