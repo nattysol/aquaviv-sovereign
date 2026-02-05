@@ -106,7 +106,7 @@ export function ProductOptionSelector({ variants }: { variants: VariantOption[] 
           ) : (
             <>
               <ShoppingBag className="w-5 h-5" />
-              <span>Add to Ritual</span>
+              <span>Add to Cart</span>
             </>
           )}
         </button>

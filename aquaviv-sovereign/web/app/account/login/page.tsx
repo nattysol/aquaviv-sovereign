@@ -1,157 +1,174 @@
 'use client';
 
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom'; 
-import { login } from '@/app/actions/auth';
-import { FadeIn } from '@/components/ui/FadeIn';
-import { ArrowRight, Loader2, AlertCircle } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  
-  return (
-    <button 
-      type="submit" // <--- EXPLICITLY SET TYPE
-      disabled={pending}
-      className="w-full h-14 bg-primary text-white font-bold rounded-lg hover:bg-[#002a55] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-    >
-      {pending ? (
-        <>
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span>Accessing Secure Vault...</span>
-        </>
-      ) : (
-        <>
-          <span>Enter Command Center</span>
-          <ArrowRight className="w-5 h-5" />
-        </>
-      )}
-    </button>
-  );
-}
+import { useState } from 'react';
+import { Check, ArrowRight, Activity, Library, Award, Calendar } from 'lucide-react';
+import { FadeIn } from '@/components/ui/FadeIn';
 
 export default function LoginPage() {
-  const [state, formAction] = useActionState(login, null);
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Debugging: Log state changes to the console
-  useEffect(() => {
-    console.log("Login State Changed:", state);
-    if (state?.success) {
-      console.log("Redirecting to dashboard...");
-      router.push('/account/dashboard');
-    }
-  }, [state, router]);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    // Simulate login delay
+    setTimeout(() => setIsLoading(false), 2000);
+  };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+    <div className="flex min-h-screen w-full flex-col lg:flex-row font-sans text-slate-900">
       
-      {/* LEFT: The Visual Ritual */}
-      <div className="hidden lg:block relative bg-slate-900 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544367563-12123d8965cd?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent" />
-        
-        <div className="relative z-10 h-full flex flex-col justify-between p-16 text-white">
-          <Link href="/">
-             <div className="relative w-32 h-10 brightness-0 invert">
-              <Image src="/logo.svg" alt="aquaViv" fill className="object-contain object-left" />
-             </div>
-          </Link>
-          
-          <div className="max-w-md">
-            <h2 className="text-4xl font-bold mb-6 leading-tight">
-              "The only true wealth is biological sovereignty."
-            </h2>
-            <div className="flex gap-4 items-center opacity-80">
-              <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center">
-                 <span className="text-xl">💧</span>
-              </div>
-              <div>
-                <p className="font-bold text-sm">Join 12,000+ Members</p>
-                <p className="text-xs text-slate-400">Optimizing daily with aquaViv</p>
+      {/* LEFT SIDE: Visual & Value Prop */}
+      <div 
+        className="relative hidden lg:flex lg:w-1/2 flex-col justify-center px-12 xl:px-24 bg-cover bg-center text-white"
+        style={{ 
+          backgroundImage: `linear-gradient(rgba(16, 34, 34, 0.8), rgba(16, 34, 34, 0.8)), url('/images/login-bg.webp')`,
+          // Note: Make sure to upload a 'login-bg.webp' to your /public/images folder
+          // Or use a placeholder color if image is missing: backgroundColor: '#102222'
+        }}
+      >
+        {/* Logo */}
+        <div className="absolute top-10 left-12 xl:left-24 flex items-center gap-3">
+          <div className="w-8 h-8 text-[#13ecec]">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fillRule="evenodd" clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight">aquaViv</h2>
+        </div>
+
+        {/* Content */}
+        <div className="max-w-xl">
+          <FadeIn>
+            <h1 className="text-5xl xl:text-6xl font-black leading-tight tracking-tight mb-8">
+              Unlock Your Sovereign Dashboard
+            </h1>
+            <p className="text-lg text-[#13ecec] mb-10 font-medium">
+              Experience the pinnacle of cellular hydration and revitalization.
+            </p>
+
+            <div className="space-y-6">
+              <h3 className="text-xl font-bold border-b border-white/20 pb-4">What&apos;s Inside</h3>
+              <div className="grid gap-5">
+                <FeatureRow icon={<Activity />} text="Personal Wellness Timeline" />
+                <FeatureRow icon={<Library />} text="Exclusive Protocol Library" />
+                <FeatureRow icon={<Award />} text="Sovereign Rewards & Tiers" />
+                <FeatureRow icon={<Calendar />} text="Ritual Control (Easy Subscriptions)" />
               </div>
             </div>
-          </div>
+          </FadeIn>
+        </div>
+
+        <div className="absolute bottom-10 left-12 xl:left-24 text-sm text-white/60">
+          © {new Date().getFullYear()} aquaViv Sovereign Wellness. All rights reserved.
         </div>
       </div>
 
-      {/* RIGHT: The Gate */}
-      <div className="flex items-center justify-center p-8 bg-surface-light">
-        <FadeIn className="w-full max-w-md space-y-8">
-          
-          <div className="text-center lg:text-left">
-            <Link href="/" className="lg:hidden inline-block mb-8 relative w-32 h-10">
-               <Image src="/logo.png" alt="aquaViv" fill className="object-contain" />
-            </Link>
-            <h1 className="text-3xl font-bold text-slate-900">Member Access</h1>
-            <p className="text-slate-500 mt-2">Log in to manage your protocol and rewards.</p>
+      {/* RIGHT SIDE: Login Form */}
+      <div className="flex flex-1 flex-col justify-center items-center px-6 py-12 lg:px-24 bg-[#f6f8f8]">
+        
+        {/* Mobile Header Logo */}
+        <div className="lg:hidden flex items-center gap-3 mb-12">
+          <div className="w-8 h-8 text-[#13ecec]">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fillRule="evenodd" clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor"></path>
+            </svg>
           </div>
+          <h2 className="text-2xl font-bold text-slate-900">aquaViv</h2>
+        </div>
 
-          {/* DEBUG AREA: Only visible if something returns but fails to render */}
-          {state && !state.success && !state.error && (
-             <div className="bg-yellow-100 text-yellow-800 p-2 text-xs font-mono break-all border border-yellow-200 rounded">
-                DEBUG: State received but no error message? <br/>
-                {JSON.stringify(state)}
-             </div>
-          )}
+        <div className="w-full max-w-[440px] space-y-8">
+          <FadeIn delay={0.1}>
+            <div className="text-left">
+              <h2 className="text-3xl font-extrabold text-[#0d1b1b] leading-tight">Welcome Back to the Ritual</h2>
+              <p className="mt-3 text-slate-500">Enter your credentials to access your sovereign space.</p>
+            </div>
 
-          <form action={formAction} className="space-y-6">
-            
-            {/* Error Message Display */}
-            {state?.error && (
-              <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm flex items-center gap-3 border border-red-100 animate-pulse">
-                <AlertCircle className="w-5 h-5 shrink-0" />
-                <p>{state.error}</p>
+            <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+              <div>
+                <label htmlFor="email" className="block text-sm font-bold text-[#0d1b1b] mb-2">Email Address</label>
+                <input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  required 
+                  placeholder="name@example.com"
+                  className="block w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-[#0d1b1b] focus:border-[#13ecec] focus:ring-0 transition-colors placeholder:text-gray-400 outline-none"
+                />
               </div>
-            )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Email Address</label>
-              <input 
-                name="email"
-                type="email" 
-                required
-                autoComplete="email"
-                placeholder="alex@example.com"
-                className="w-full h-12 px-4 rounded-lg border-slate-200 focus:border-primary focus:ring-primary bg-white text-slate-900"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <label className="text-sm font-bold text-slate-700">Password</label>
-                <a href="#" className="text-sm text-primary font-medium hover:underline">Forgot?</a>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label htmlFor="password" classNa="block text-sm font-bold text-[#0d1b1b]">Password</label>
+                  <Link href="/forgot-password" className="text-sm font-semibold text-[#13ecec] hover:underline">
+                    Forgot Password?
+                  </Link>
+                </div>
+                <input 
+                  id="password" 
+                  name="password" 
+                  type="password" 
+                  required 
+                  placeholder="••••••••"
+                  className="block w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-[#0d1b1b] focus:border-[#13ecec] focus:ring-0 transition-colors placeholder:text-gray-400 outline-none"
+                />
               </div>
-              <input 
-                name="password"
-                type="password" 
-                required
-                autoComplete="current-password"
-                placeholder="••••••••"
-                className="w-full h-12 px-4 rounded-lg border-slate-200 focus:border-primary focus:ring-primary bg-white text-slate-900"
-              />
+
+              <div className="flex items-center gap-3">
+                <input 
+                  id="remember" 
+                  type="checkbox"
+                  className="h-5 w-5 rounded border-gray-300 text-[#13ecec] focus:ring-[#13ecec]"
+                />
+                <label htmlFor="remember" className="text-sm font-medium text-gray-600">Keep me signed in</label>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isLoading}
+                className="flex w-full items-center justify-center rounded-lg bg-[#13ecec] py-4 text-base font-bold text-[#0d1b1b] shadow-lg shadow-[#13ecec]/20 hover:bg-[#13ecec]/90 hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Accessing Ritual...' : 'Sign In'}
+              </button>
+            </form>
+
+            <div className="mt-8 relative">
+              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm font-medium uppercase tracking-wider">
+                <span className="bg-[#f6f8f8] px-4 text-gray-400">New to aquaViv?</span>
+              </div>
             </div>
 
-            <SubmitButton />
-
-            <div className="text-center text-sm text-slate-500">
-              New to the protocol? <Link href="/account/register" className="text-primary font-bold hover:underline">Apply for Access</Link>
+            <div className="mt-8 text-center">
+              <Link href="/register" className="inline-flex items-center gap-2 text-base font-bold text-[#0d1b1b] hover:text-[#13ecec] transition-colors group">
+                Create an Account
+                <ArrowRight className="w-5 h-5 text-[#13ecec] group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
-          </form>
+          </FadeIn>
+        </div>
 
-          <div className="pt-8 border-t border-slate-200 text-center">
-             <p className="text-xs text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-               Secure Encryption Active
-             </p>
-          </div>
+        {/* Mobile Footer */}
+        <div className="lg:hidden mt-12 pt-8 border-t border-gray-200 w-full flex justify-between text-xs text-gray-400">
+          <Link href="/privacy">Privacy Policy</Link>
+          <Link href="/terms">Terms of Service</Link>
+        </div>
 
-        </FadeIn>
       </div>
+    </div>
+  );
+}
+
+// Helper Component for the Left Side Features
+function FeatureRow({ icon, text }: { icon: any, text: string }) {
+  return (
+    <div className="flex items-center gap-4 group">
+      <div className="text-[#13ecec] group-hover:scale-110 transition-transform duration-300">
+        {icon}
+      </div>
+      <p className="text-lg font-normal group-hover:text-[#13ecec] transition-colors">{text}</p>
     </div>
   );
 }
