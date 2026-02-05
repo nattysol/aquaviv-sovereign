@@ -16,6 +16,7 @@ const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0]
   // Content Fields
   benefits,         // Expecting Array of Strings
   ritual,           // Expecting String or Text Block
+  proTip,           // Expecting String or Text Block    
   ingredients,      // Expecting String or Text Block
   longDescription,  // Expecting Portable Text (Block Content)
   faqs,             // Expecting Array of Objects {question, answer}
@@ -202,22 +203,29 @@ export default async function ProductPage({ params }: PageProps) {
                 </details>
 
                 {/* 3. Ritual */}
-                <details className="group border-b border-slate-100">
-                  <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
-                    <span className="flex items-center gap-3">
-                      <Droplet className="w-5 h-5 text-accent" />
-                      Daily Ritual
-                    </span>
-                    <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
-                  </summary>
-                  <div className="pb-6 text-slate-600 leading-relaxed pl-8">
-                     <p>{product.ritual || "Take 1ml daily in water or juice."}</p>
-                     <div className="mt-4 bg-amber-50 text-amber-900 px-4 py-3 rounded-lg text-sm flex gap-3 items-start">
-                        <AlertCircle className="w-5 h-5 shrink-0" />
-                        <p>Pro Tip: Consistent daily use amplifies results over time.</p>
-                     </div>
-                  </div>
-                </details>
+<details className="group border-b border-slate-100">
+  <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
+    <span className="flex items-center gap-3">
+      <Droplet className="w-5 h-5 text-accent" />
+      Daily Ritual
+    </span>
+    <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
+  </summary>
+  <div className="pb-6 text-slate-600 leading-relaxed pl-8">
+     <p>{product.ritual || "Take 1ml daily in water or juice."}</p>
+     
+     {/* DYNAMIC PRO TIP: Only shows if you wrote one in Sanity */}
+     {product.proTip && (
+       <div className="mt-4 bg-amber-50 text-amber-900 px-4 py-3 rounded-lg text-sm flex gap-3 items-start border border-amber-100/50">
+          <AlertCircle className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" />
+          <div>
+            <span className="font-bold text-amber-800 block mb-1">Pro Tip</span>
+            {product.proTip}
+          </div>
+       </div>
+     )}
+  </div>
+</details>
 
               </div>
             </FadeIn>

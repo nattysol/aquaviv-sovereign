@@ -81,6 +81,13 @@ export default defineType({
       description: 'How should the user consume this? (The "Laboratory" guidance)',
     }),
     defineField({
+    name: 'proTip',
+    title: 'Ritual Pro Tip',
+    type: 'text',
+    rows: 3,
+    description: 'A short, expert tip displayed inside the yellow box in the Ritual accordion.',
+}),
+    defineField({
       name: 'shopifyId_1',
       title: 'Shopify Variant ID (1 Bottle)',
       type: 'string',
