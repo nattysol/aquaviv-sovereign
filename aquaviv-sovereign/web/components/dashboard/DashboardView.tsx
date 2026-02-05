@@ -208,7 +208,7 @@ export function DashboardView({ customer }: DashboardProps) {
               {customer.orders.edges.length === 0 && (
                 <div className="text-center py-12 text-slate-500">
                   <p>No orders found.</p>
-                  <Link href="/product" className="text-primary font-bold hover:underline mt-2 inline-block">Start your first order</Link>
+                  <Link href="/shop" className="text-primary font-bold hover:underline mt-2 inline-block">Start your first order</Link>
                 </div>
               )}
             </div>
