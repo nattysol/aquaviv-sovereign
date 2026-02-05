@@ -8,7 +8,8 @@ import {
   removeFromCartAPI, 
   updateCartLineAPI 
 } from '@/lib/shopify-cart';
-import { useReferral } from './ReferralContext'; // <--- Import the hook
+import { useReferral } from './ReferralContext';
+// import { trackKlaviyoEvent } from '@/lib/klaviyo'; // Uncomment if you have this file
 
 type CartContextType = {
   cart: any | null;
@@ -17,7 +18,7 @@ type CartContextType = {
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
-  addToCart: (variantId: string, quantity: number) => Promise<void>;
+  addToCart: (variantId: string | number, quantity: number) => Promise<void>; // Updated type
   removeItem: (lineId: string) => Promise<void>;
   updateQuantity: (lineId: string, quantity: number) => Promise<void>;
   checkoutUrl: string;
@@ -31,9 +32,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  // 1. Get the Referral Code safely
-  // We wrap this in a try/catch or optional chain just in case of provider order issues,
-  // but since we fixed the hook above, this is standard:
+  // Safe Access to Referral Code
   const { referralCode } = useReferral(); 
 
   useEffect(() => {
@@ -51,39 +50,59 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     initializeCart();
   }, []);
 
-  const formatId = (id: string) => {
+  // --- FIX 1: SAFETY CAST TO STRING ---
+  const formatId = (id: string | number) => {
     if (!id) return '';
-    if (id.includes('gid://shopify/ProductVariant/')) return id;
-    return `gid://shopify/ProductVariant/${id}`;
+    const idStr = String(id); // Force it to be a string
+    if (idStr.includes('gid://shopify/ProductVariant/')) return idStr;
+    return `gid://shopify/ProductVariant/${idStr}`;
   };
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
   const toggleCart = () => setIsOpen(!isOpen);
 
-  async function addToCart(rawVariantId: string, quantity: number) {
+  async function addToCart(rawVariantId: string | number, quantity: number) {
+    // 1. Debug Log: See if the button click is even registering
+    console.log("Adding to cart:", rawVariantId, quantity);
+    
     setIsLoading(true);
     const variantId = formatId(rawVariantId);
 
     try {
       let newCart;
+      
+      // A. If Cart Exists, Add to it
       if (cart?.id) {
         try {
           newCart = await addToCartAPI(cart.id, variantId, quantity);
         } catch (e) {
-          console.warn("Cart expired, creating new one...", e);
+          console.warn("Cart expired or failed, creating new one...", e);
           localStorage.removeItem('aquaviv_cart_id');
           newCart = await createCart(variantId, quantity);
           localStorage.setItem('aquaviv_cart_id', newCart.id);
         }
-      } else {
+      } 
+      // B. If No Cart, Create New One
+      else {
         newCart = await createCart(variantId, quantity);
         localStorage.setItem('aquaviv_cart_id', newCart.id);
       }
+
       setCart(newCart);
       setIsOpen(true);
+      
+      // --- KLAVIYO TRACKING (Wrapped in try/catch so it never breaks the cart) ---
+      try {
+         // trackKlaviyoEvent('Added to Cart', { ItemId: variantId, Quantity: quantity });
+         console.log("Tracked 'Added to Cart'");
+      } catch (err) {
+         console.error("Tracking Error (Non-Fatal):", err);
+      }
+
     } catch (error) {
-      console.error("Failed to add to cart:", error);
+      console.error("CRITICAL: Failed to add to cart:", error);
+      alert("Could not add to cart. Please check your connection.");
     } finally {
       setIsLoading(false);
     }
@@ -117,13 +136,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const itemCount = cart?.totalQuantity || 0;
 
-  // --- THE LOGIC FIX IS HERE ---
-  // We calculate the Final URL without redeclaring 'checkoutUrl' twice.
+  // Logic: Append Discount Code to Checkout URL
   const baseCheckoutUrl = cart?.checkoutUrl || '';
-  
   let finalCheckoutUrl = baseCheckoutUrl;
+  
   if (baseCheckoutUrl && referralCode) {
-    // Check if URL already has '?' to decide between '?' and '&'
     const separator = baseCheckoutUrl.includes('?') ? '&' : '?';
     finalCheckoutUrl = `${baseCheckoutUrl}${separator}discount=${referralCode}`;
   }
@@ -139,7 +156,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       addToCart, 
       removeItem, 
       updateQuantity, 
-      checkoutUrl: finalCheckoutUrl, // Pass the calculated URL here
+      checkoutUrl: finalCheckoutUrl, 
       isLoading 
     }}>
       {children}
