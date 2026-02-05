@@ -169,3 +169,30 @@ export async function getCart(cartId: string) {
   const response = await shopifyFetch({ query, variables: { cartId } });
   return response.data?.cart;
 }
+// 5. Update Line Item Quantity
+export async function updateCartLineAPI(cartId: string, lineId: string, quantity: number) {
+  const query = `
+    mutation cartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+      cartLinesUpdate(cartId: $cartId, lines: $lines) {
+        cart {
+          ...cartDetails
+        }
+      }
+    }
+    ${CART_FRAGMENT}
+  `;
+
+  const response = await shopifyFetch({
+    query,
+    variables: { 
+      cartId, 
+      lines: [{ id: lineId, quantity }] 
+    },
+  });
+
+  if (!response.data?.cartLinesUpdate?.cart) {
+    throw new Error("Error updating quantity.");
+  }
+
+  return response.data.cartLinesUpdate.cart;
+}

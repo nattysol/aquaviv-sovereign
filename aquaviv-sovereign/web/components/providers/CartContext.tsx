@@ -1,15 +1,25 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { createCart, addToCartAPI, getCart, removeFromCartAPI } from '@/lib/shopify-cart'; // <--- Added import
+import { 
+  createCart, 
+  addToCartAPI, 
+  getCart, 
+  removeFromCartAPI, 
+  updateCartLineAPI 
+} from '@/lib/shopify-cart';
 
 type CartContextType = {
   cart: any | null;
   itemCount: number;
-  addToCart: (variantId: string, quantity: number) => Promise<void>;
-  removeItem: (lineId: string) => Promise<void>; // <--- Added Type
-  isCartOpen: boolean;
+  isOpen: boolean;           // Match CartDrawer expectation
+  openCart: () => void;
+  closeCart: () => void;
   toggleCart: () => void;
+  addToCart: (variantId: string, quantity: number) => Promise<void>;
+  removeItem: (lineId: string) => Promise<void>;
+  updateQuantity: (lineId: string, quantity: number) => Promise<void>; // Match CartDrawer
+  checkoutUrl: string;       // Match CartDrawer
   isLoading: boolean;
 };
 
@@ -17,9 +27,10 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<any>(null);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Renamed from isCartOpen to match expectations
   const [isLoading, setIsLoading] = useState(false);
 
+  // 1. Load Cart
   useEffect(() => {
     const initializeCart = async () => {
       const storedCartId = localStorage.getItem('aquaviv_cart_id');
@@ -35,12 +46,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     initializeCart();
   }, []);
 
-  // Helper: Ensure IDs are formatted correctly
+  // Helper: ID Cleaner
   const formatId = (id: string) => {
     if (!id) return '';
     if (id.includes('gid://shopify/ProductVariant/')) return id;
     return `gid://shopify/ProductVariant/${id}`;
   };
+
+  // 2. Actions
+  const openCart = () => setIsOpen(true);
+  const closeCart = () => setIsOpen(false);
+  const toggleCart = () => setIsOpen(!isOpen);
 
   async function addToCart(rawVariantId: string, quantity: number) {
     setIsLoading(true);
@@ -62,7 +78,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('aquaviv_cart_id', newCart.id);
       }
       setCart(newCart);
-      setIsCartOpen(true);
+      setIsOpen(true);
     } catch (error) {
       console.error("Failed to add to cart:", error);
     } finally {
@@ -70,7 +86,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // --- NEW: Remove Item Logic ---
   async function removeItem(lineId: string) {
     if (!cart?.id) return;
     setIsLoading(true);
@@ -84,11 +99,37 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const toggleCart = () => setIsCartOpen(!isCartOpen);
+  async function updateQuantity(lineId: string, quantity: number) {
+    if (!cart?.id) return;
+    setIsLoading(true);
+    try {
+      const newCart = await updateCartLineAPI(cart.id, lineId, quantity);
+      setCart(newCart);
+    } catch (error) {
+      console.error("Failed to update quantity:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  // 3. Derived State
   const itemCount = cart?.totalQuantity || 0;
+  const checkoutUrl = cart?.checkoutUrl || '';
 
   return (
-    <CartContext.Provider value={{ cart, itemCount, addToCart, removeItem, isCartOpen, toggleCart, isLoading }}>
+    <CartContext.Provider value={{ 
+      cart, 
+      itemCount, 
+      isOpen, 
+      openCart, 
+      closeCart, 
+      toggleCart, 
+      addToCart, 
+      removeItem, 
+      updateQuantity, 
+      checkoutUrl, 
+      isLoading 
+    }}>
       {children}
     </CartContext.Provider>
   );
