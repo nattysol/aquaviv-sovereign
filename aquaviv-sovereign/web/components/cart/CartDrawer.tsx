@@ -42,7 +42,7 @@ export function CartDrawer() {
         <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-surface-light">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-primary" />
-            <h2 className="text-xl font-bold text-slate-900">Your Ritual</h2>
+            <h2 className="text-xl font-bold text-slate-900">Your Cart</h2>
             <span className="bg-accent/10 text-accent text-xs font-bold px-2 py-1 rounded-full">
               {cart?.totalQuantity || 0} items
             </span>

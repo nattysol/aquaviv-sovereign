@@ -1,43 +1,57 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { Navbar } from "@/components/layout/Navbar"; // Import Navbar
-import { Footer } from "@/components/layout/Footer"; // Import Footer
-import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
-import { CartProvider } from '@/components/providers/CartContext'; // <--- Import this
-import { CartDrawer } from '@/components/cart/CartDrawer'; // <--- DO YOU HAVE THIS?
-import { ReferralProvider } from '@/components/providers/ReferralContext'; // <--- Import this if you want referral context available globally  
-import { Suspense } from 'react'; // <--- 1. Import this
+import type { Metadata } from 'next';
+import { Manrope } from 'next/font/google';
+import './globals.css';
+import { Suspense } from 'react'; // <--- Fixes "Cannot find name Suspense"
+import Script from 'next/script';
+
+// Providers
+import { CartProvider } from '@/components/providers/CartContext'; // <--- Fixes "Cannot find CartProvider"
+import { ReferralProvider } from '@/components/providers/ReferralContext'; // <--- Fixes "Cannot find ReferralProvider"
+
+// Analytics
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import { KLAVIYO_SCRIPT_URL } from '@/lib/klaviyo';
+
+// Components
+import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
+
+const manrope = Manrope({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "aquaViv Sovereign",
-  description: "Clinical Grade Mineral Hydration",
+  title: 'aquaViv | Sovereign Hydration',
+  description: 'Clinical grade minerals for biological sovereignty.',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen flex flex-col">
-        {/* 2. Wrap the Provider in Suspense */}
+      <body className={manrope.className}>
+        {/* Suspense is required when using useSearchParams (ReferralProvider) */}
         <Suspense fallback={null}>
-        <ReferralProvider><CartProvider> {/* <--- WRAP EVERYTHING INSIDE THIS */}
-        {/* The Shell */}
-        <Navbar />
-        
-        {/* The Page Content */}
-        <div className="flex-1">
-          {children}
-        </div>
+          <ReferralProvider>
+            <CartProvider>
+              <Navbar />
+              <main className="min-h-screen pt-20">
+                {children}
+              </main>
+              <Footer />
 
-        {/* The Footer */}
-        <Footer />
-        <MobileBottomNav /> {/* <--- ADD THIS LINE HERE */}
-        <CartDrawer /> {/* <--- ADD THE CART DRAWER HERE */}
-        </CartProvider>
-        </ReferralProvider>
+              {/* --- ANALYTICS SUITE --- */}
+              <GoogleAnalytics />
+              
+              <Script 
+                id="klaviyo-init"
+                strategy="afterInteractive"
+                src={KLAVIYO_SCRIPT_URL}
+              />
+              
+            </CartProvider>
+          </ReferralProvider>
         </Suspense>
       </body>
     </html>

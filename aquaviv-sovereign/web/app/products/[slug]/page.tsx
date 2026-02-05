@@ -1,10 +1,10 @@
 import { client } from '@/sanity/lib/client';
 import { ProductGallery } from '@/components/product/ProductGallery';
 import { ProductOptionSelector } from '@/components/product/ProductOptionSelector';
+import { KlaviyoTracker } from '@/components/KlaviyoTracker'; // Tracks "Viewed Product"
+import { RichText } from '@/components/ui/RichText'; // Beautiful Typography
 import { Star, ChevronDown, Droplet, Activity, ShieldCheck, Leaf, FlaskConical, AlertCircle } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
-import { PortableText } from '@portabletext/react';
-import { RichText } from '@/components/ui/RichText';
 
 // 1. THE MASTER QUERY
 const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0] {
@@ -25,10 +25,16 @@ const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0]
   longDescription,
   faqs,
 
-  // Commerce Data
+  // Commerce Data (Legacy/Manual)
   shopifyId_1,
   shopifyId_3,
   shopifyId_6,
+  
+  // Commerce Data (Manual Price Overrides)
+  price_3_pack,
+  price_6_pack,
+
+  // Commerce Data (Automatic Sync)
   store {
     gid, 
     price,
@@ -61,22 +67,60 @@ export default async function ProductPage({ params }: PageProps) {
   }
 
   // --- LOGIC: BUILD VARIANT OPTIONS ---
+  // This handles the "Math" to match Shopify prices ($89.95 / $174.95)
   let variants = [];
   
+  // A. Automatic Sync (If linked to Parent Product)
   if (product.store?.variants?.length > 0) {
     variants = product.store.variants.map((v: any) => ({
       id: v.store.gid,
       title: v.store.title,
       price: v.store.price,
       label: v.store.title.includes('3') ? 'Popular' : 'Standard',
-      savings: v.store.title.includes('3') ? 'Save 15%' : v.store.title.includes('6') ? 'Save 25%' : null
+      savings: v.store.title.includes('3') ? 'Save 33%' : v.store.title.includes('6') ? 'Save 35%' : null
     }));
   } 
+  // B. Manual IDs (The Fallback Engine)
   else if (product.shopifyId_1) {
-    variants.push({ id: product.shopifyId_1, title: '1 Bottle', price: product.price, label: 'Starter' });
-    if (product.shopifyId_3) variants.push({ id: product.shopifyId_3, title: '3 Bottles', price: product.price * 3 * 0.67, label: 'Most Popular', savings: 'Save 15%' });
-    if (product.shopifyId_6) variants.push({ id: product.shopifyId_6, title: '6 Bottles', price: product.price * 6 * 0.65, label: 'Best Value', savings: 'Save 25%' });
+    // 1 Bottle
+    variants.push({ 
+      id: product.shopifyId_1, 
+      title: '1 Bottle', 
+      price: product.price, 
+      label: 'Starter' 
+    });
+
+    // 3 Bottles
+    if (product.shopifyId_3) {
+      // Priority: Use explicit "price_3_pack" from Sanity. 
+      // Fallback: Calculate 33% off (approx $89.95)
+      const price3 = product.price_3_pack || (product.price * 3 * 0.67);
+      
+      variants.push({ 
+        id: product.shopifyId_3, 
+        title: '3 Bottles', 
+        price: price3, 
+        label: 'Most Popular', 
+        savings: 'Save 33%' 
+      });
+    }
+
+    // 6 Bottles
+    if (product.shopifyId_6) {
+      // Priority: Use explicit "price_6_pack" from Sanity.
+      // Fallback: Calculate 35% off (approx $174.95)
+      const price6 = product.price_6_pack || (product.price * 6 * 0.65);
+
+      variants.push({ 
+        id: product.shopifyId_6, 
+        title: '6 Bottles', 
+        price: price6, 
+        label: 'Best Value', 
+        savings: 'Save 35%' 
+      });
+    }
   }
+  // C. Single Item Fallback
   else if (product.store?.gid || product.store?.variantID) {
     variants.push({
       id: product.store?.gid || product.store?.variantID,
@@ -89,7 +133,10 @@ export default async function ProductPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-surface-light text-slate-900 pb-24 pt-20">
       
-      {/* SECTION 1: HERO & COMMERCE */}
+      {/* 1. KLAVIYO TRACKING (Invisible) */}
+      <KlaviyoTracker product={product} />
+
+      {/* 2. HERO SECTION */}
       <div className="max-w-7xl mx-auto px-4 lg:px-10 py-12 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20">
           
@@ -219,25 +266,24 @@ export default async function ProductPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* SECTION 2: THE DEEP DIVE (Rich Text) */}
-{product.longDescription && (
-  <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
-    <div className="max-w-3xl mx-auto px-4">
-      <FadeIn>
-        <div className="text-center mb-12">
-           <h2 className="text-sm font-bold text-accent uppercase tracking-widest mb-3">The Science</h2>
-           <p className="text-3xl font-bold text-slate-900">Deep Dive into the Source</p>
-        </div>
+      {/* 3. THE DEEP DIVE (Formatted Rich Text) */}
+      {product.longDescription && (
+        <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
+          <div className="max-w-3xl mx-auto px-4">
+            <FadeIn>
+              <div className="text-center mb-12">
+                 <h2 className="text-sm font-bold text-accent uppercase tracking-widest mb-3">The Science</h2>
+                 <p className="text-3xl font-bold text-slate-900">Deep Dive into the Source</p>
+              </div>
+              
+              <RichText content={product.longDescription} />
+              
+            </FadeIn>
+          </div>
+        </section>
+      )}
 
-        {/* The New Component */}
-        <RichText content={product.longDescription} />
-
-      </FadeIn>
-    </div>
-  </section>
-)}
-
-      {/* SECTION 3: FAQs */}
+      {/* 4. FAQs */}
       {product.faqs && product.faqs.length > 0 && (
         <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
           <div className="max-w-3xl mx-auto px-4">
