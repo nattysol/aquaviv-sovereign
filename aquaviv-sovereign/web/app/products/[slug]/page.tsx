@@ -1,32 +1,36 @@
 import { client } from '@/sanity/lib/client';
 import { urlFor } from '@/sanity/lib/image';
-import { ProductOptionSelector } from '@/components/product/ProductOptionSelector'; // <--- NEW COMPONENT
+import { ProductOptionSelector } from '@/components/product/ProductOptionSelector';
+import { AddToCartButton } from '@/components/product/AddToCartButton';
 import { Star, ChevronDown, Droplet, Activity, ShieldCheck, Leaf, FlaskConical, AlertCircle } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
 import { PortableText } from '@portabletext/react';
 
+// 1. THE MASTER QUERY
+// Fetches both Commerce Data (Shopify) and Rich Content (Sanity)
 const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0] {
   title,
   tagline,
   price,
-  benefits,
-  ritual,
-  ingredients,
-  longDescription,
-  faqs,
+  
+  // Content Fields
+  benefits,         // Expecting Array of Strings
+  ritual,           // Expecting String or Text Block
+  ingredients,      // Expecting String or Text Block
+  longDescription,  // Expecting Portable Text (Block Content)
+  faqs,             // Expecting Array of Objects {question, answer}
   mainImage,
   
-  // 1. MANUAL OVERRIDES (Legacy Support)
+  // Manual Override IDs (Legacy)
   shopifyId_1,
   shopifyId_3,
   shopifyId_6,
 
-  // 2. AUTOMATIC SYNC (Modern)
+  // Automatic Sync Data
   store {
     gid, 
     price,
     inventory { isAvailable },
-    // If you linked the PARENT product, this array will be populated
     variants[]-> {
       store {
         gid,
@@ -46,12 +50,18 @@ export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
   const product = await client.fetch(PRODUCT_BY_SLUG_QUERY, { slug });
 
-  if (!product) return <div>Product Not Found</div>;
+  if (!product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-primary">
+        <h1 className="text-2xl font-bold">Product Not Found</h1>
+      </div>
+    );
+  }
 
-  // --- BUILD THE VARIANT OPTIONS LIST ---
+  // --- LOGIC: BUILD VARIANT OPTIONS ---
   let variants = [];
-
-  // A. Try Automatic Sync (If linked to Parent Product)
+  
+  // 1. Try Automatic Sync (If linked to Parent Product with variants)
   if (product.store?.variants?.length > 0) {
     variants = product.store.variants.map((v: any) => ({
       id: v.store.gid,
@@ -61,13 +71,13 @@ export default async function ProductPage({ params }: PageProps) {
       savings: v.store.title.includes('3') ? 'Save 15%' : v.store.title.includes('6') ? 'Save 25%' : null
     }));
   } 
-  // B. Try Manual IDs (Legacy / Fallback)
+  // 2. Try Manual IDs (Fallback)
   else if (product.shopifyId_1) {
     variants.push({ id: product.shopifyId_1, title: '1 Bottle', price: product.price, label: 'Starter' });
     if (product.shopifyId_3) variants.push({ id: product.shopifyId_3, title: '3 Bottles', price: product.price * 3 * 0.85, label: 'Most Popular', savings: 'Save 15%' });
     if (product.shopifyId_6) variants.push({ id: product.shopifyId_6, title: '6 Bottles', price: product.price * 6 * 0.75, label: 'Best Value', savings: 'Save 25%' });
   }
-  // C. Fallback to Single Variant (What you likely have now)
+  // 3. Single Item Fallback (Standard)
   else if (product.store?.gid || product.store?.variantID) {
     variants.push({
       id: product.store?.gid || product.store?.variantID,
@@ -77,62 +87,181 @@ export default async function ProductPage({ params }: PageProps) {
     });
   }
 
-  // Fallback prices if manual manual IDs didn't have specific prices attached
-  // (In a real app, you'd fetch these specific prices from Shopify)
-
   return (
     <main className="min-h-screen bg-surface-light text-slate-900 pb-24 pt-20">
       
-      {/* ... HERO SECTION (Same as before) ... */}
+      {/* SECTION 1: HERO & COMMERCE */}
       <div className="max-w-7xl mx-auto px-4 lg:px-10 py-12 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20">
           
           {/* Left: Gallery */}
           <div className="lg:col-span-7 flex flex-col gap-4 lg:sticky lg:top-32 h-fit">
-             <FadeIn>
-               {product.mainImage && (
-                  <div className="w-full aspect-[4/5] bg-white rounded-2xl border border-slate-200 overflow-hidden p-8">
-                     <img src={urlFor(product.mainImage).width(1000).url()} alt={product.title} className="w-full h-full object-contain" />
+            <FadeIn>
+              <div className="w-full aspect-[4/5] bg-gradient-to-b from-white to-slate-50 rounded-2xl overflow-hidden relative group border border-slate-200 shadow-sm">
+                {product.mainImage ? (
+                  <img 
+                    src={urlFor(product.mainImage).width(1000).url()} 
+                    alt={product.title}
+                    className="w-full h-full object-contain p-8 hover:scale-105 transition-transform duration-700"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-primary/20 bg-primary/5">
+                    <Droplet className="w-32 h-32" />
                   </div>
-               )}
-             </FadeIn>
+                )}
+                <div className="absolute top-6 left-6 bg-white/90 backdrop-blur border border-slate-200 px-3 py-1.5 rounded-full text-xs font-bold text-primary uppercase tracking-wider shadow-sm">
+                  Clinical Grade
+                </div>
+              </div>
+            </FadeIn>
+            
+            <div className="flex justify-center gap-6 lg:hidden text-slate-400">
+               <ShieldCheck className="w-6 h-6" />
+               <Leaf className="w-6 h-6" />
+               <FlaskConical className="w-6 h-6" />
+            </div>
           </div>
 
           {/* Right: The Engine */}
           <div className="lg:col-span-5 flex flex-col gap-8">
             <FadeIn delay={0.1}>
               <div className="space-y-4 border-b border-slate-100 pb-8">
-                <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-primary">{product.title}</h1>
-                <p className="text-lg text-slate-500">{product.tagline}</p>
+                <div className="flex items-center gap-3">
+                  <div className="flex text-amber-400">
+                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
+                  </div>
+                  <span className="text-slate-500 text-sm font-medium">4.9/5 (128 Reviews)</span>
+                </div>
+                
+                <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-primary">
+                  {product.title}
+                </h1>
+                <p className="text-lg text-slate-500 leading-relaxed">
+                  {product.tagline}
+                </p>
               </div>
             </FadeIn>
 
-            {/* THE NEW SELECTOR */}
+            {/* SELECTOR OR BUTTON */}
             <FadeIn delay={0.2}>
-               <ProductOptionSelector variants={variants} />
+               {variants.length > 0 ? (
+                 <ProductOptionSelector variants={variants} />
+               ) : (
+                 <div className="bg-red-50 p-4 text-red-600 rounded">
+                   Sync Error: No Variants Found. Please check Sanity Connection.
+                 </div>
+               )}
             </FadeIn>
 
-            {/* ... Rest of Accordions/Details ... */}
-             <div className="border-t border-slate-100 mt-4 space-y-0">
+            {/* --- ACCORDIONS (CONTENT SECTION) --- */}
+            <FadeIn delay={0.3}>
+              <div className="border-t border-slate-100 mt-4 space-y-0">
+                
+                {/* 1. Benefits */}
                 <details className="group border-b border-slate-100" open>
-                  <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary">
-                    <span className="flex items-center gap-3"><Activity className="w-5 h-5 text-accent" /> Benefits</span>
+                  <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
+                    <span className="flex items-center gap-3">
+                      <Activity className="w-5 h-5 text-accent" />
+                      Clinical Benefits
+                    </span>
                     <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
                   </summary>
-                  <div className="pb-6 text-slate-600 pl-8">
-                    <ul className="space-y-2">
-                       {product.benefits?.map((b: string, i: number) => <li key={i}>• {b}</li>)}
-                    </ul>
+                  <div className="pb-6 text-slate-600 leading-relaxed pl-8">
+                    {product.benefits && product.benefits.length > 0 ? (
+                      <ul className="space-y-3">
+                        {product.benefits.map((benefit: string, i: number) => (
+                          <li key={i} className="flex gap-2 items-start">
+                            <span className="text-accent mt-1.5 text-[10px]">●</span>
+                            <span>{benefit}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>Supports cellular hydration, energy, and cognitive function.</p>
+                    )}
                   </div>
                 </details>
-             </div>
 
+                {/* 2. Ingredients */}
+                <details className="group border-b border-slate-100">
+                  <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
+                    <span className="flex items-center gap-3">
+                      <Leaf className="w-5 h-5 text-accent" />
+                      Ingredients & Sourcing
+                    </span>
+                    <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div className="pb-6 text-slate-600 leading-relaxed pl-8">
+                    <p>{product.ingredients || "100% Concentrated Ionic Sea Minerals from Utah's Great Inland Sea."}</p>
+                    <div className="mt-4 flex gap-3 text-xs font-bold uppercase tracking-wider text-slate-400">
+                      <span className="border border-slate-200 px-2 py-1 rounded">Non-GMO</span>
+                      <span className="border border-slate-200 px-2 py-1 rounded">Vegan</span>
+                      <span className="border border-slate-200 px-2 py-1 rounded">GF</span>
+                    </div>
+                  </div>
+                </details>
+
+                {/* 3. Ritual */}
+                <details className="group border-b border-slate-100">
+                  <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
+                    <span className="flex items-center gap-3">
+                      <Droplet className="w-5 h-5 text-accent" />
+                      Daily Ritual
+                    </span>
+                    <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div className="pb-6 text-slate-600 leading-relaxed pl-8">
+                     <p>{product.ritual || "Take 1ml daily in water or juice."}</p>
+                     <div className="mt-4 bg-amber-50 text-amber-900 px-4 py-3 rounded-lg text-sm flex gap-3 items-start">
+                        <AlertCircle className="w-5 h-5 shrink-0" />
+                        <p>Pro Tip: Consistent daily use amplifies results over time.</p>
+                     </div>
+                  </div>
+                </details>
+
+              </div>
+            </FadeIn>
           </div>
         </div>
       </div>
-      
-      {/* ... Rich Text ... */}
-      
+
+      {/* SECTION 2: THE DEEP DIVE (Rich Text) */}
+      {product.longDescription && (
+        <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
+          <div className="max-w-3xl mx-auto px-4">
+            <FadeIn>
+              <div className="prose prose-slate prose-lg mx-auto prose-headings:font-bold prose-headings:text-primary prose-p:text-slate-600 prose-li:text-slate-600 prose-strong:text-primary">
+                <PortableText value={product.longDescription} />
+              </div>
+            </FadeIn>
+          </div>
+        </section>
+      )}
+
+      {/* SECTION 3: FAQs */}
+      {product.faqs && product.faqs.length > 0 && (
+        <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
+          <div className="max-w-3xl mx-auto px-4">
+             <FadeIn>
+               <h2 className="text-3xl font-bold text-center text-primary mb-12">Frequently Asked Questions</h2>
+               <div className="space-y-4">
+                 {product.faqs.map((faq: any, i: number) => (
+                   <details key={i} className="group bg-surface-light rounded-xl overflow-hidden">
+                     <summary className="flex justify-between items-center font-bold text-lg p-6 cursor-pointer text-slate-900 hover:text-primary transition-colors list-none">
+                       <span>{faq.question}</span>
+                       <ChevronDown className="w-5 h-5 text-slate-400 transition-transform group-open:rotate-180" />
+                     </summary>
+                     <div className="px-6 pb-6 text-slate-600 leading-relaxed">
+                       {faq.answer}
+                     </div>
+                   </details>
+                 ))}
+               </div>
+             </FadeIn>
+          </div>
+        </section>
+      )}
+
     </main>
   );
 }
