@@ -1,6 +1,17 @@
 const domain = process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN!;
 const storefrontAccessToken = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN!;
 
+// --- HELPER: Fixes broken IDs automatically ---
+function formatVariantId(id: string): string {
+  if (!id) return '';
+  // If it's already a proper GID, return it
+  if (id.startsWith('gid://shopify/ProductVariant/')) {
+    return id;
+  }
+  // If it's just a number (e.g., "42958057930818"), fix it
+  return `gid://shopify/ProductVariant/${id}`;
+}
+
 async function shopifyFetch({ query, variables }: { query: string; variables?: any }) {
   const endpoint = `https://${domain}/api/2024-01/graphql.json`;
 
@@ -13,10 +24,16 @@ async function shopifyFetch({ query, variables }: { query: string; variables?: a
     body: JSON.stringify({ query, variables }),
   });
 
-  return response.json();
+  const json = await response.json();
+  
+  // Log API errors to console for easier debugging
+  if (json.errors) {
+    console.error("Shopify API Error:", JSON.stringify(json.errors, null, 2));
+  }
+  
+  return json;
 }
 
-// Reusable Fragment: Ensures we always get the data our Cart Page expects
 const CART_FRAGMENT = `
   fragment cartDetails on Cart {
     id
@@ -61,6 +78,8 @@ const CART_FRAGMENT = `
 
 // 1. Create a fresh Cart
 export async function createCart(variantId: string, quantity: number) {
+  const cleanId = formatVariantId(variantId); // <--- Auto-Fix applied here
+  
   const query = `
     mutation cartCreate($lines: [CartLineInput!]) {
       cartCreate(input: { lines: $lines }) {
@@ -74,14 +93,20 @@ export async function createCart(variantId: string, quantity: number) {
 
   const response = await shopifyFetch({
     query,
-    variables: { lines: [{ merchandiseId: variantId, quantity }] },
+    variables: { lines: [{ merchandiseId: cleanId, quantity }] },
   });
+
+  if (!response.data?.cartCreate?.cart) {
+    throw new Error("Fatal Error creating cart: " + JSON.stringify(response.errors));
+  }
 
   return response.data.cartCreate.cart;
 }
 
 // 2. Add Item to Existing Cart
 export async function addToCartAPI(cartId: string, variantId: string, quantity: number) {
+  const cleanId = formatVariantId(variantId); // <--- Auto-Fix applied here
+
   const query = `
     mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
       cartLinesAdd(cartId: $cartId, lines: $lines) {
@@ -95,13 +120,17 @@ export async function addToCartAPI(cartId: string, variantId: string, quantity: 
 
   const response = await shopifyFetch({
     query,
-    variables: { cartId, lines: [{ merchandiseId: variantId, quantity }] },
+    variables: { cartId, lines: [{ merchandiseId: cleanId, quantity }] },
   });
+
+  if (!response.data?.cartLinesAdd?.cart) {
+    throw new Error("Error adding item. Resetting cart...");
+  }
 
   return response.data.cartLinesAdd.cart;
 }
 
-// 3. Retrieve Cart (Refresh on page load)
+// 3. Retrieve Cart
 export async function getCart(cartId: string) {
   const query = `
     query getCart($cartId: ID!) {
@@ -113,25 +142,5 @@ export async function getCart(cartId: string) {
   `;
 
   const response = await shopifyFetch({ query, variables: { cartId } });
-  return response.data.cart;
-}
-// 4. Remove Item from Cart
-export async function removeFromCartAPI(cartId: string, lineIds: string[]) {
-  const query = `
-    mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
-      cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
-        cart {
-          ...cartDetails
-        }
-      }
-    }
-    ${CART_FRAGMENT}
-  `;
-
-  const response = await shopifyFetch({
-    query,
-    variables: { cartId, lineIds },
-  });
-
-  return response.data.cartLinesRemove.cart;
+  return response.data?.cart;
 }
