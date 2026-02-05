@@ -67,6 +67,21 @@ export default defineType({
       },
     }),
     defineField({
+  name: 'gallery',
+  title: 'Image Gallery',
+  type: 'array',
+  description: 'Add extra angles, lifestyle shots, or close-ups.',
+  of: [{ type: 'image', options: { hotspot: true } }],
+}),
+
+defineField({
+  name: 'video',
+  title: 'Product Video (MP4)',
+  type: 'file',
+  description: 'Upload a short, looping MP4 (max 10MB recommended) for the hero section.',
+  options: { accept: 'video/mp4' },
+}),
+    defineField({
       name: 'benefits',
       title: 'Clinical Benefits',
       type: 'array',

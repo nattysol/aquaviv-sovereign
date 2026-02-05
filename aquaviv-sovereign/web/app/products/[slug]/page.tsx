@@ -1,33 +1,33 @@
 import { client } from '@/sanity/lib/client';
-import { urlFor } from '@/sanity/lib/image';
+import { ProductGallery } from '@/components/product/ProductGallery';
 import { ProductOptionSelector } from '@/components/product/ProductOptionSelector';
-import { AddToCartButton } from '@/components/product/AddToCartButton';
 import { Star, ChevronDown, Droplet, Activity, ShieldCheck, Leaf, FlaskConical, AlertCircle } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
 import { PortableText } from '@portabletext/react';
 
 // 1. THE MASTER QUERY
-// Fetches both Commerce Data (Shopify) and Rich Content (Sanity)
 const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0] {
   title,
   tagline,
   price,
   
-  // Content Fields
-  benefits,         // Expecting Array of Strings
-  ritual,           // Expecting String or Text Block
-  proTip,           // Expecting String or Text Block    
-  ingredients,      // Expecting String or Text Block
-  longDescription,  // Expecting Portable Text (Block Content)
-  faqs,             // Expecting Array of Objects {question, answer}
+  // Media
   mainImage,
-  
-  // Manual Override IDs (Legacy)
+  gallery,
+  "videoUrl": video.asset->url,
+
+  // Content
+  benefits,
+  ritual,
+  proTip,
+  ingredients,
+  longDescription,
+  faqs,
+
+  // Commerce Data
   shopifyId_1,
   shopifyId_3,
   shopifyId_6,
-
-  // Automatic Sync Data
   store {
     gid, 
     price,
@@ -62,7 +62,6 @@ export default async function ProductPage({ params }: PageProps) {
   // --- LOGIC: BUILD VARIANT OPTIONS ---
   let variants = [];
   
-  // 1. Try Automatic Sync (If linked to Parent Product with variants)
   if (product.store?.variants?.length > 0) {
     variants = product.store.variants.map((v: any) => ({
       id: v.store.gid,
@@ -72,13 +71,11 @@ export default async function ProductPage({ params }: PageProps) {
       savings: v.store.title.includes('3') ? 'Save 15%' : v.store.title.includes('6') ? 'Save 25%' : null
     }));
   } 
-  // 2. Try Manual IDs (Fallback)
   else if (product.shopifyId_1) {
     variants.push({ id: product.shopifyId_1, title: '1 Bottle', price: product.price, label: 'Starter' });
     if (product.shopifyId_3) variants.push({ id: product.shopifyId_3, title: '3 Bottles', price: product.price * 3 * 0.85, label: 'Most Popular', savings: 'Save 15%' });
     if (product.shopifyId_6) variants.push({ id: product.shopifyId_6, title: '6 Bottles', price: product.price * 6 * 0.75, label: 'Best Value', savings: 'Save 25%' });
   }
-  // 3. Single Item Fallback (Standard)
   else if (product.store?.gid || product.store?.variantID) {
     variants.push({
       id: product.store?.gid || product.store?.variantID,
@@ -95,26 +92,14 @@ export default async function ProductPage({ params }: PageProps) {
       <div className="max-w-7xl mx-auto px-4 lg:px-10 py-12 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20">
           
-          {/* Left: Gallery */}
+          {/* Left: Gallery (Video + Images) */}
           <div className="lg:col-span-7 flex flex-col gap-4 lg:sticky lg:top-32 h-fit">
-            <FadeIn>
-              <div className="w-full aspect-[4/5] bg-gradient-to-b from-white to-slate-50 rounded-2xl overflow-hidden relative group border border-slate-200 shadow-sm">
-                {product.mainImage ? (
-                  <img 
-                    src={urlFor(product.mainImage).width(1000).url()} 
-                    alt={product.title}
-                    className="w-full h-full object-contain p-8 hover:scale-105 transition-transform duration-700"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-primary/20 bg-primary/5">
-                    <Droplet className="w-32 h-32" />
-                  </div>
-                )}
-                <div className="absolute top-6 left-6 bg-white/90 backdrop-blur border border-slate-200 px-3 py-1.5 rounded-full text-xs font-bold text-primary uppercase tracking-wider shadow-sm">
-                  Clinical Grade
-                </div>
-              </div>
-            </FadeIn>
+            
+            <ProductGallery 
+              mainImage={product.mainImage} 
+              gallery={product.gallery} 
+              video={product.videoUrl} 
+            />
             
             <div className="flex justify-center gap-6 lg:hidden text-slate-400">
                <ShieldCheck className="w-6 h-6" />
@@ -143,7 +128,7 @@ export default async function ProductPage({ params }: PageProps) {
               </div>
             </FadeIn>
 
-            {/* SELECTOR OR BUTTON */}
+            {/* SELECTOR & ADD TO CART */}
             <FadeIn delay={0.2}>
                {variants.length > 0 ? (
                  <ProductOptionSelector variants={variants} />
@@ -203,29 +188,29 @@ export default async function ProductPage({ params }: PageProps) {
                 </details>
 
                 {/* 3. Ritual */}
-<details className="group border-b border-slate-100">
-  <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
-    <span className="flex items-center gap-3">
-      <Droplet className="w-5 h-5 text-accent" />
-      Daily Ritual
-    </span>
-    <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
-  </summary>
-  <div className="pb-6 text-slate-600 leading-relaxed pl-8">
-     <p>{product.ritual || "Take 1ml daily in water or juice."}</p>
-     
-     {/* DYNAMIC PRO TIP: Only shows if you wrote one in Sanity */}
-     {product.proTip && (
-       <div className="mt-4 bg-amber-50 text-amber-900 px-4 py-3 rounded-lg text-sm flex gap-3 items-start border border-amber-100/50">
-          <AlertCircle className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" />
-          <div>
-            <span className="font-bold text-amber-800 block mb-1">Pro Tip</span>
-            {product.proTip}
-          </div>
-       </div>
-     )}
-  </div>
-</details>
+                <details className="group border-b border-slate-100">
+                  <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
+                    <span className="flex items-center gap-3">
+                      <Droplet className="w-5 h-5 text-accent" />
+                      Daily Ritual
+                    </span>
+                    <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div className="pb-6 text-slate-600 leading-relaxed pl-8">
+                     <p>{product.ritual || "Take 1ml daily in water or juice."}</p>
+                     
+                     {/* DYNAMIC PRO TIP */}
+                     {product.proTip && (
+                       <div className="mt-4 bg-amber-50 text-amber-900 px-4 py-3 rounded-lg text-sm flex gap-3 items-start border border-amber-100/50">
+                          <AlertCircle className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-amber-800 block mb-1">Pro Tip</span>
+                            {product.proTip}
+                          </div>
+                       </div>
+                     )}
+                  </div>
+                </details>
 
               </div>
             </FadeIn>
