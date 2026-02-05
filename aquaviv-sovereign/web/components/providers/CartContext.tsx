@@ -1,12 +1,13 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { createCart, addToCartAPI, getCart } from '@/lib/shopify-cart';
+import { createCart, addToCartAPI, getCart, removeFromCartAPI } from '@/lib/shopify-cart'; // <--- Added import
 
 type CartContextType = {
   cart: any | null;
   itemCount: number;
   addToCart: (variantId: string, quantity: number) => Promise<void>;
+  removeItem: (lineId: string) => Promise<void>; // <--- Added Type
   isCartOpen: boolean;
   toggleCart: () => void;
   isLoading: boolean;
@@ -34,43 +35,32 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     initializeCart();
   }, []);
 
-  // --- HELPER: NUCLEAR ID CLEANER ---
-  // This ensures the ID is ALWAYS in the format Shopify wants
+  // Helper: Ensure IDs are formatted correctly
   const formatId = (id: string) => {
     if (!id) return '';
     if (id.includes('gid://shopify/ProductVariant/')) return id;
-    // If it's just a number, wrap it
     return `gid://shopify/ProductVariant/${id}`;
   };
 
   async function addToCart(rawVariantId: string, quantity: number) {
     setIsLoading(true);
-    
-    // 1. CLEAN THE ID IMMEDIATELY
     const variantId = formatId(rawVariantId);
-    console.log("Adding Clean ID:", variantId); // Debug log
 
     try {
       let newCart;
-      
-      // A. Add to existing cart
       if (cart?.id) {
         try {
           newCart = await addToCartAPI(cart.id, variantId, quantity);
         } catch (e) {
-          console.warn("Cart expired or API error, creating new one...", e);
-          // Fallback: Create new cart
+          console.warn("Cart expired, creating new one...", e);
           localStorage.removeItem('aquaviv_cart_id');
           newCart = await createCart(variantId, quantity);
           localStorage.setItem('aquaviv_cart_id', newCart.id);
         }
-      } 
-      // B. Create brand new cart
-      else {
+      } else {
         newCart = await createCart(variantId, quantity);
         localStorage.setItem('aquaviv_cart_id', newCart.id);
       }
-
       setCart(newCart);
       setIsCartOpen(true);
     } catch (error) {
@@ -80,11 +70,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // --- NEW: Remove Item Logic ---
+  async function removeItem(lineId: string) {
+    if (!cart?.id) return;
+    setIsLoading(true);
+    try {
+      const newCart = await removeFromCartAPI(cart.id, lineId);
+      setCart(newCart);
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   const toggleCart = () => setIsCartOpen(!isCartOpen);
   const itemCount = cart?.totalQuantity || 0;
 
   return (
-    <CartContext.Provider value={{ cart, itemCount, addToCart, isCartOpen, toggleCart, isLoading }}>
+    <CartContext.Provider value={{ cart, itemCount, addToCart, removeItem, isCartOpen, toggleCart, isLoading }}>
       {children}
     </CartContext.Provider>
   );
