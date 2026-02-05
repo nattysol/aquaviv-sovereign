@@ -10,6 +10,7 @@ import { ReferralProvider } from '@/components/providers/ReferralContext';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { KLAVIYO_SCRIPT_URL } from '@/lib/klaviyo';
 import { Navbar } from '@/components/layout/Navbar';
+import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { Footer } from '@/components/layout/Footer';
 
 const manrope = Manrope({ subsets: ['latin'] });
@@ -37,7 +38,8 @@ export default function RootLayout({
               <main className="min-h-screen">
                 {children}
               </main>
-
+{/* 2. PLACE IT HERE (Outside Main) */}
+              <MobileBottomNav />
               <Footer />
               <GoogleAnalytics />
               <Script 
