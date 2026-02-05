@@ -76,6 +76,31 @@ const CART_FRAGMENT = `
   }
 `;
 
+// 4. Remove Item from Cart
+export async function removeFromCartAPI(cartId: string, lineId: string) {
+  const query = `
+    mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+      cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+        cart {
+          ...cartDetails
+        }
+      }
+    }
+    ${CART_FRAGMENT}
+  `;
+
+  const response = await shopifyFetch({
+    query,
+    variables: { cartId, lineIds: [lineId] },
+  });
+
+  if (!response.data?.cartLinesRemove?.cart) {
+    throw new Error("Error removing item.");
+  }
+
+  return response.data.cartLinesRemove.cart;
+}
+
 // 1. Create a fresh Cart
 export async function createCart(variantId: string, quantity: number) {
   const cleanId = formatVariantId(variantId); // <--- Auto-Fix applied here
