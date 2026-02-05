@@ -1,11 +1,11 @@
 import { client } from '@/sanity/lib/client';
 import { urlFor } from '@/sanity/lib/image';
-import { AddToCartButton } from '@/components/product/AddToCartButton'; // <--- We use our working button
+import { AddToCartButton } from '@/components/product/AddToCartButton';
 import { Star, ChevronDown, Droplet, Activity, ShieldCheck, Leaf, FlaskConical, AlertCircle } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
 import { PortableText } from '@portabletext/react';
 
-// 1. DYNAMIC QUERY (Now fetches the synced Shopify ID automatically)
+// 1. DYNAMIC QUERY - Matches YOUR Data Structure
 const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0] {
   title,
   tagline,
@@ -17,17 +17,11 @@ const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0]
   faqs,
   mainImage,
   
-  // FETCH SHOPIFY DATA AUTOMATICALLY
+  // MATCHING YOUR DATA STRUCTURE EXACTLY:
   store {
-    variants[]-> {
-      store {
-        gid,
-        price,
-        inventory {
-          isAvailable
-        }
-      }
-    }
+    variantID,     // <--- The key field
+    price,
+    isAvailable
   }
 }`;
 
@@ -47,11 +41,11 @@ export default async function ProductPage({ params }: PageProps) {
     );
   }
 
-  // Extract the synced ID
-  const firstVariant = product.store?.variants?.[0]?.store;
-  const variantId = firstVariant?.gid;
-  const isAvailable = firstVariant?.inventory?.isAvailable ?? true;
-  const price = firstVariant?.price || product.price;
+  // 2. EXTRACTION LOGIC - Matches your schema
+  const storeData = product.store;
+  const variantId = storeData?.variantID; // <--- Now using variantID
+  const isAvailable = storeData?.isAvailable ?? true;
+  const price = storeData?.price || product.price;
 
   return (
     <main className="min-h-screen bg-surface-light text-slate-900 pb-24 pt-20">
@@ -80,12 +74,6 @@ export default async function ProductPage({ params }: PageProps) {
                 </div>
               </div>
             </FadeIn>
-            
-            <div className="flex justify-center gap-6 lg:hidden text-slate-400">
-               <ShieldCheck className="w-6 h-6" />
-               <Leaf className="w-6 h-6" />
-               <FlaskConical className="w-6 h-6" />
-            </div>
           </div>
 
           {/* Right: The Engine */}
@@ -128,7 +116,7 @@ export default async function ProductPage({ params }: PageProps) {
                     <AddToCartButton variantId={variantId} available={isAvailable} />
                   ) : (
                     <div className="p-4 bg-amber-50 text-amber-800 text-sm rounded-lg border border-amber-200">
-                      <strong>Sync Required:</strong> Please select the Shopify product in Sanity Studio to enable purchasing.
+                      <strong>Sync Error:</strong> Cannot find &quot;variantID&quot; in Sanity. Please re-publish the product.
                     </div>
                   )}
                   <p className="text-center text-xs text-slate-400 mt-4">
@@ -140,73 +128,48 @@ export default async function ProductPage({ params }: PageProps) {
             {/* Accordions */}
             <FadeIn delay={0.3}>
               <div className="border-t border-slate-100 mt-4 space-y-0">
-                
                 {/* Benefits */}
                 <details className="group border-b border-slate-100" open>
                   <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
-                    <span className="flex items-center gap-3">
-                      <Activity className="w-5 h-5 text-accent" />
-                      Clinical Benefits
-                    </span>
+                    <span className="flex items-center gap-3"><Activity className="w-5 h-5 text-accent" /> Clinical Benefits</span>
                     <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
                   </summary>
                   <div className="pb-6 text-slate-600 leading-relaxed pl-8">
                     <ul className="space-y-3">
                       {product.benefits?.map((benefit: string, i: number) => (
-                        <li key={i} className="flex gap-2 items-start">
-                          <span className="text-accent mt-1.5 text-[10px]">●</span>
-                          <span>{benefit}</span>
-                        </li>
+                        <li key={i} className="flex gap-2 items-start"><span className="text-accent mt-1.5 text-[10px]">●</span><span>{benefit}</span></li>
                       ))}
                       {!product.benefits && <li>Supports cellular hydration and energy.</li>}
                     </ul>
                   </div>
                 </details>
-
                 {/* Ingredients */}
                 <details className="group border-b border-slate-100">
                   <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
-                    <span className="flex items-center gap-3">
-                      <Leaf className="w-5 h-5 text-accent" />
-                      Ingredients & Sourcing
-                    </span>
+                    <span className="flex items-center gap-3"><Leaf className="w-5 h-5 text-accent" /> Ingredients</span>
                     <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
                   </summary>
                   <div className="pb-6 text-slate-600 leading-relaxed pl-8">
                     <p>{product.ingredients || "100% Concentrated Ionic Sea Minerals."}</p>
-                    <div className="mt-4 flex gap-3 text-xs font-bold uppercase tracking-wider text-slate-400">
-                      <span className="border border-slate-200 px-2 py-1 rounded">Non-GMO</span>
-                      <span className="border border-slate-200 px-2 py-1 rounded">Vegan</span>
-                      <span className="border border-slate-200 px-2 py-1 rounded">GF</span>
-                    </div>
                   </div>
                 </details>
-
                 {/* Ritual */}
                 <details className="group border-b border-slate-100">
                   <summary className="flex justify-between items-center font-bold text-lg py-5 cursor-pointer text-primary hover:text-accent transition-colors list-none">
-                    <span className="flex items-center gap-3">
-                      <Droplet className="w-5 h-5 text-accent" />
-                      Daily Ritual
-                    </span>
+                    <span className="flex items-center gap-3"><Droplet className="w-5 h-5 text-accent" /> Daily Ritual</span>
                     <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
                   </summary>
                   <div className="pb-6 text-slate-600 leading-relaxed pl-8">
                      <p>{product.ritual || "Take 1ml daily in water."}</p>
-                     <div className="mt-4 bg-amber-50 text-amber-900 px-4 py-3 rounded-lg text-sm flex gap-3 items-start">
-                        <AlertCircle className="w-5 h-5 shrink-0" />
-                        <p>Pro Tip: Mix with lemon water or juice.</p>
-                     </div>
                   </div>
                 </details>
-
               </div>
             </FadeIn>
           </div>
         </div>
       </div>
 
-      {/* SECTION 2: THE DEEP DIVE (Rich Text) */}
+      {/* RICH TEXT */}
       {product.longDescription && (
         <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
           <div className="max-w-3xl mx-auto px-4">
@@ -215,30 +178,6 @@ export default async function ProductPage({ params }: PageProps) {
                 <PortableText value={product.longDescription} />
               </div>
             </FadeIn>
-          </div>
-        </section>
-      )}
-
-      {/* SECTION 3: FAQs */}
-      {product.faqs && (
-        <section className="bg-white border-t border-slate-100 py-16 lg:py-24">
-          <div className="max-w-3xl mx-auto px-4">
-             <FadeIn>
-               <h2 className="text-3xl font-bold text-center text-primary mb-12">Frequently Asked Questions</h2>
-               <div className="space-y-4">
-                 {product.faqs.map((faq: any, i: number) => (
-                   <details key={i} className="group bg-surface-light rounded-xl overflow-hidden">
-                     <summary className="flex justify-between items-center font-bold text-lg p-6 cursor-pointer text-slate-900 hover:text-primary transition-colors list-none">
-                       <span>{faq.question}</span>
-                       <ChevronDown className="w-5 h-5 text-slate-400 transition-transform group-open:rotate-180" />
-                     </summary>
-                     <div className="px-6 pb-6 text-slate-600 leading-relaxed">
-                       {faq.answer}
-                     </div>
-                   </details>
-                 ))}
-               </div>
-             </FadeIn>
           </div>
         </section>
       )}
