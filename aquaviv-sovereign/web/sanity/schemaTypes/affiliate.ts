@@ -1,63 +1,52 @@
 import { defineField, defineType } from 'sanity'
-import { Users } from 'lucide-react'
 
 export default defineType({
   name: 'affiliate',
   title: 'Affiliate Partners',
   type: 'document',
-  icon: Users,
   fields: [
     defineField({
       name: 'name',
-      title: 'Full Name',
+      title: 'Partner Name',
       type: 'string',
-      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'email',
       title: 'Email Address',
       type: 'string',
-      validation: (rule) => rule.required().email(),
     }),
     defineField({
-      name: 'slug',
-      title: 'Dashboard Handle',
-      type: 'slug',
-      options: {
-        source: 'name',
-        maxLength: 96,
-      },
-    }),
-    defineField({
-      name: 'category',
-      title: 'Professional Category',
+      name: 'password', 
+      title: 'Access Key (Password)',
       type: 'string',
-      options: {
-        list: [
-          { title: 'Wellness Influencer', value: 'influencer' },
-          { title: 'Holistic Practitioner', value: 'practitioner' },
-          { title: 'Health Coach', value: 'coach' },
-        ],
-      },
+      description: 'Simple access key for their dashboard.',
+      hidden: true, // Hide from UI if possible, or use a secure hash in production
     }),
     defineField({
-      name: 'socialReach',
-      title: 'Social Reach / Audience Size',
+      name: 'code',
+      title: 'Discount Code',
       type: 'string',
-      description: 'e.g., "@wellnessbyjane (50k)"',
+      description: 'The code they share (e.g., SOVEREIGN20). Must match a Shopify Discount Code.',
+    }),
+    defineField({
+      name: 'commissionRate',
+      title: 'Commission Rate (%)',
+      type: 'number',
+      initialValue: 20,
+    }),
+    defineField({
+      name: 'totalEarnings',
+      title: 'Total Earnings ($)',
+      type: 'number',
+      initialValue: 0,
+      readOnly: true, // Updated via Webhook
     }),
     defineField({
       name: 'status',
-      title: 'Application Status',
+      title: 'Status',
       type: 'string',
+      options: { list: ['active', 'pending', 'banned'] },
       initialValue: 'pending',
-      options: {
-        list: [
-          { title: 'Pending Review', value: 'pending' },
-          { title: 'Approved (Active)', value: 'approved' },
-          { title: 'Rejected', value: 'rejected' },
-        ],
-      },
     }),
   ],
 })

@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer"; // Import Footer
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { CartProvider } from '@/components/providers/CartContext'; // <--- Import this
 import { CartDrawer } from '@/components/cart/CartDrawer'; // <--- DO YOU HAVE THIS?
+import { ReferralProvider } from '@/components/providers/ReferralContext'; // <--- Import this if you want referral context available globally  
 
 export const metadata: Metadata = {
   title: "aquaViv Sovereign",
@@ -19,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased min-h-screen flex flex-col">
-        <CartProvider> {/* <--- WRAP EVERYTHING INSIDE THIS */}
+        <ReferralProvider><CartProvider> {/* <--- WRAP EVERYTHING INSIDE THIS */}
         {/* The Shell */}
         <Navbar />
         
@@ -33,6 +34,7 @@ export default function RootLayout({
         <MobileBottomNav /> {/* <--- ADD THIS LINE HERE */}
         <CartDrawer /> {/* <--- ADD THE CART DRAWER HERE */}
         </CartProvider>
+        </ReferralProvider>
       </body>
     </html>
   );

@@ -2,32 +2,62 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { client } from '@/sanity/lib/client'; // Import Sanity Client
 import { ArrowRight, TrendingUp, DollarSign, Image as ImageIcon, Users, ShieldCheck } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
 
 export default function AffiliateLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate login
-    setTimeout(() => setIsLoading(false), 2000);
+    setError('');
+
+    // 1. Get values from the form
+    const target = e.target as typeof e.target & {
+      email: { value: string };
+      password: { value: string };
+    };
+    const email = target.email.value;
+    const password = target.password.value;
+
+    try {
+      // 2. Ask Sanity: "Does an affiliate with this email/password exist?"
+      // Note: This is a simple auth method. For high security, use NextAuth.
+      const query = `*[_type == "affiliate" && email == $email && password == $password][0]`;
+      const affiliate = await client.fetch(query, { email, password });
+
+      if (affiliate) {
+        // 3. Success! Save their ID and redirect
+        localStorage.setItem('aquaviv_affiliate_id', affiliate._id);
+        router.push('/affiliate/dashboard');
+      } else {
+        // 4. Failure
+        setError('Invalid email or access key.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Connection error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row font-sans text-slate-900">
       
-      {/* LEFT SIDE: The "Sell" (Benefits) */}
+      {/* LEFT SIDE: The "Sell" */}
       <div 
         className="relative hidden lg:flex lg:w-1/2 flex-col justify-center px-12 xl:px-24 bg-cover bg-center text-white"
         style={{ 
-          // Use a slightly different image or the same brand style
           backgroundImage: `linear-gradient(rgba(16, 34, 34, 0.85), rgba(16, 34, 34, 0.9)), url('/images/affiliate-bg.webp')`, 
           backgroundColor: '#102222' 
         }}
       >
-        {/* Logo */}
         <div className="absolute top-10 left-12 xl:left-24 flex items-center gap-3">
           <div className="w-8 h-8 text-[#13ecec]">
             <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -37,7 +67,6 @@ export default function AffiliateLoginPage() {
           <h2 className="text-2xl font-bold tracking-tight">aquaViv <span className="opacity-50 font-normal">| Partners</span></h2>
         </div>
 
-        {/* Value Proposition */}
         <div className="max-w-xl">
           <FadeIn>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#13ecec]/30 bg-[#13ecec]/10 text-[#13ecec] text-xs font-bold uppercase tracking-wider mb-6">
@@ -55,49 +84,18 @@ export default function AffiliateLoginPage() {
             <div className="space-y-6">
               <h3 className="text-xl font-bold border-b border-white/20 pb-4 text-white">Program Privileges</h3>
               <div className="grid gap-5">
-                <BenefitRow 
-                  icon={<DollarSign />} 
-                  title="20% Commission" 
-                  desc="Earn generous payouts on every order you generate." 
-                />
-                <BenefitRow 
-                  icon={<TrendingUp />} 
-                  title="Real-Time Analytics" 
-                  desc="Track clicks, conversions, and revenue instantly." 
-                />
-                <BenefitRow 
-                  icon={<ImageIcon />} 
-                  title="Creative Asset Library" 
-                  desc="Access professional photos, videos, and scientific copy." 
-                />
-                <BenefitRow 
-                  icon={<Users />} 
-                  title="Priority Partner Support" 
-                  desc="Direct line to our dedicated partnership team." 
-                />
+                <BenefitRow icon={<DollarSign />} title="20% Commission" desc="Earn generous payouts on every order you generate." />
+                <BenefitRow icon={<TrendingUp />} title="Real-Time Analytics" desc="Track clicks, conversions, and revenue instantly." />
+                <BenefitRow icon={<ImageIcon />} title="Creative Asset Library" desc="Access professional photos, videos, and scientific copy." />
+                <BenefitRow icon={<Users />} title="Priority Partner Support" desc="Direct line to our dedicated partnership team." />
               </div>
             </div>
           </FadeIn>
-        </div>
-
-        <div className="absolute bottom-10 left-12 xl:left-24 text-sm text-white/40">
-          © {new Date().getFullYear()} aquaViv Sovereign Wellness.
         </div>
       </div>
 
       {/* RIGHT SIDE: Login Form */}
       <div className="flex flex-1 flex-col justify-center items-center px-6 py-12 lg:px-24 bg-[#f6f8f8]">
-        
-        {/* Mobile Header */}
-        <div className="lg:hidden flex items-center gap-3 mb-12">
-          <div className="w-8 h-8 text-[#13ecec]">
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor"></path>
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900">aquaViv Partners</h2>
-        </div>
-
         <div className="w-full max-w-[440px] space-y-8">
           <FadeIn delay={0.1}>
             <div className="text-left">
@@ -105,6 +103,14 @@ export default function AffiliateLoginPage() {
               <p className="mt-3 text-slate-500">Access your dashboard, links, and payout history.</p>
             </div>
 
+            {/* ERROR MESSAGE GOES HERE (Inside the JSX) */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-lg text-center font-medium animate-pulse">
+                {error}
+              </div>
+            )}
+
+            {/* FORM HANDLER GOES HERE */}
             <form onSubmit={handleSubmit} className="mt-8 space-y-6">
               <div>
                 <label htmlFor="email" className="block text-sm font-bold text-[#0d1b1b] mb-2">Email Address</label>
@@ -120,9 +126,9 @@ export default function AffiliateLoginPage() {
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label htmlFor="password" className="block text-sm font-bold text-[#0d1b1b]">Password</label>
+                  <label htmlFor="password" className="block text-sm font-bold text-[#0d1b1b]">Access Key (Password)</label>
                   <Link href="/affiliate/forgot-password" className="text-sm font-semibold text-[#13ecec] hover:underline">
-                    Forgot Password?
+                    Forgot Key?
                   </Link>
                 </div>
                 <input 
@@ -140,8 +146,7 @@ export default function AffiliateLoginPage() {
                 disabled={isLoading}
                 className="flex w-full items-center justify-center rounded-lg bg-[#0d1b1b] py-4 text-base font-bold text-white shadow-lg shadow-black/10 hover:bg-slate-800 hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {/* Note: Button is Dark for Affiliate to distinguish from Customer Login */}
-                {isLoading ? 'Verifying Partner...' : 'Access Portal'}
+                {isLoading ? 'Verifying...' : 'Access Portal'}
               </button>
             </form>
 
@@ -162,13 +167,11 @@ export default function AffiliateLoginPage() {
             </div>
           </FadeIn>
         </div>
-        
       </div>
     </div>
   );
 }
 
-// Helper: Specific Row Design for Affiliates
 function BenefitRow({ icon, title, desc }: { icon: any, title: string, desc: string }) {
   return (
     <div className="flex gap-4 group">
