@@ -4,10 +4,11 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Check, ArrowRight, PlayCircle, MessageCircle, Star, 
-  HelpCircle, Camera, ArrowUp, ChevronLeft, Info
+  HelpCircle, Camera, ArrowUp, ChevronLeft, Info, Instagram, 
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image'; // <--- ADD THIS LINE
+
 
 // --- TYPES ---
 type Message = {
@@ -204,7 +205,7 @@ export default function SocialHubPage() {
         {/* 4. FOOTER */}
         <footer className="mt-8 flex flex-col items-center gap-6">
            <div className="flex items-center gap-4">
-              {['Instagram', 'Twitter', 'TikTok'].map((social, i) => (
+              {['Instagram'].map((social, i) => (
                 <div key={i} className="w-10 h-10 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-[#13ecec] hover:text-[#102222] transition-colors cursor-pointer text-[#0d1b1b] dark:text-white">
                   <span className="text-[10px] font-bold">{social[0]}</span>
                 </div>
