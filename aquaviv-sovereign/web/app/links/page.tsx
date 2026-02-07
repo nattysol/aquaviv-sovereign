@@ -2,13 +2,16 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   Check, ArrowRight, PlayCircle, MessageCircle, Star, 
-  HelpCircle, Camera, ArrowUp, ChevronLeft, Info, Instagram, 
+  HelpCircle, Camera, ArrowUp, ChevronLeft, Info, X,
+  Instagram
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import Image from 'next/image'; // <--- ADD THIS LINE
 
+// --- CONFIGURATION ---
+const YOUTUBE_VIDEO_ID = "NoJwmTojdWk"; // <--- REPLACE THIS WITH YOUR REAL ID
 
 // --- TYPES ---
 type Message = {
@@ -20,6 +23,7 @@ type Message = {
 
 export default function SocialHubPage() {
   const [showChat, setShowChat] = useState(false);
+  const [showVideo, setShowVideo] = useState(false); // <--- New State for Video
   
   // --- CHAT STATE ---
   const [inputValue, setInputValue] = useState("");
@@ -32,7 +36,6 @@ export default function SocialHubPage() {
     }
   ]);
   
-  // Auto-scroll to bottom of chat
   const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (showChat) {
@@ -40,11 +43,9 @@ export default function SocialHubPage() {
     }
   }, [messages, isTyping, showChat]);
 
-  // --- THE LIVE BRAIN ---
   const handleSend = async () => {
     if (!inputValue.trim()) return;
 
-    // 1. Add User Message (Instant)
     const userText = inputValue;
     const newUserMsg: Message = {
       id: Date.now().toString(),
@@ -54,10 +55,9 @@ export default function SocialHubPage() {
 
     setMessages(prev => [...prev, newUserMsg]);
     setInputValue("");
-    setIsTyping(true); // Show "..." bubble
+    setIsTyping(true);
 
     try {
-      // 2. Call the Real API
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -66,7 +66,6 @@ export default function SocialHubPage() {
 
       const data = await response.json();
 
-      // 3. Add AI Response
       const botReply: Message = {
         id: (Date.now() + 1).toString(),
         text: data.reply || "Connection error.",
@@ -76,7 +75,6 @@ export default function SocialHubPage() {
       setMessages(prev => [...prev, botReply]);
 
     } catch (error) {
-      // Error Fallback
       const errorReply: Message = {
         id: (Date.now() + 1).toString(),
         text: "Signal interrupted. Please check your connection.",
@@ -109,12 +107,12 @@ export default function SocialHubPage() {
             <div className="absolute -inset-1 bg-[#13ecec] rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
             <div className="relative size-28 rounded-full border-4 border-white dark:border-[#102222] shadow-xl overflow-hidden bg-slate-100">
                <Image 
-      src="/icon.webp" 
-      alt="aquaViv Logo" 
-      fill 
-      className="object-cover" 
-      priority
-    />
+                  src="/icon.webp" 
+                  alt="aquaViv Logo" 
+                  fill 
+                  className="object-cover" 
+                  priority
+                />
             </div>
             <div className="absolute bottom-1 right-1 bg-[#13ecec] text-[#0d1b1b] rounded-full p-1 border-2 border-white dark:border-[#102222] flex items-center justify-center">
               <Check size={14} strokeWidth={4} />
@@ -145,8 +143,11 @@ export default function SocialHubPage() {
             </div>
           </Link>
 
-          {/* B. VIDEO: MINERAL SCIENCE */}
-          <Link href="/science" className="group flex items-center gap-4 rounded-2xl bg-[#082f2f] p-5 text-white shadow-lg relative overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+          {/* B. VIDEO: MINERAL SCIENCE (Triggers Overlay) */}
+          <button 
+             onClick={() => setShowVideo(true)} // <--- TRIGGERS VIDEO
+             className="group flex items-center gap-4 rounded-2xl bg-[#082f2f] p-5 text-white shadow-lg relative overflow-hidden hover:scale-[1.02] transition-transform duration-300 w-full text-left"
+          >
              <div className="absolute right-0 top-0 w-32 h-32 bg-[#13ecec]/10 rounded-full -mr-16 -mt-16 blur-xl" />
              <div className="flex-shrink-0 w-14 h-14 rounded-full bg-[#13ecec]/20 flex items-center justify-center border border-[#13ecec]/30">
                <PlayCircle size={32} className="text-[#13ecec] fill-[#13ecec]/20" />
@@ -155,7 +156,7 @@ export default function SocialHubPage() {
                <h3 className="text-lg font-bold">The Mineral Science</h3>
                <p className="text-[#13ecec]/70 text-sm">Deep-sea education series</p>
              </div>
-          </Link>
+          </button>
 
           {/* C. INTERACTIVE: CONTACT SUPPORT */}
           <button 
@@ -205,18 +206,16 @@ export default function SocialHubPage() {
         {/* 4. FOOTER */}
         <footer className="mt-8 flex flex-col items-center gap-6">
            <div className="flex items-center gap-4">
-              {['Instagram'].map((social, i) => (
-                <div key={i} className="w-10 h-10 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-[#13ecec] hover:text-[#102222] transition-colors cursor-pointer text-[#0d1b1b] dark:text-white">
-                  <span className="text-[10px] font-bold">{social[0]}</span>
-                </div>
-              ))}
+              <Link href="https://instagram.com/aquaviv" target="_blank" className="size-10 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-[#13ecec] hover:text-[#102222] transition-colors text-[#0d1b1b] dark:text-white group">
+                <Instagram size={18} />
+              </Link>
            </div>
            <p className="text-xs text-[#4c9a9a]/60">© {new Date().getFullYear()} aquaViv. All Rights Reserved.</p>
         </footer>
 
       </div>
 
-      {/* 5. IOS CHAT OVERLAY (LIVE) */}
+      {/* 5. IOS CHAT OVERLAY */}
       <AnimatePresence>
         {showChat && (
           <>
@@ -242,13 +241,13 @@ export default function SocialHubPage() {
                      </button>
                      <div className="flex flex-col items-center">
                         <div className="size-10 rounded-full border border-[#13ecec] overflow-hidden mb-1 relative">
-   <Image 
-     src="/icon.webp" 
-     alt="Concierge Avatar" 
-     fill 
-     className="object-cover" 
-   />
-</div>
+                           <Image 
+                             src="/icon.webp" 
+                             alt="Concierge Avatar" 
+                             fill 
+                             className="object-cover" 
+                           />
+                        </div>
                         <span className="text-[11px] font-bold text-gray-500 dark:text-[#13ecec]/60 uppercase tracking-tighter">aquaViv Support</span>
                      </div>
                      <Info size={24} className="text-[#007aff]" />
@@ -264,7 +263,6 @@ export default function SocialHubPage() {
                      </span>
                   </div>
                   
-                  {/* Messages Map */}
                   {messages.map((msg) => (
                     <div 
                       key={msg.id}
@@ -285,7 +283,6 @@ export default function SocialHubPage() {
                     </div>
                   ))}
 
-                  {/* Typing Indicator */}
                   {isTyping && (
                     <div className="flex items-center gap-1.5 px-4 py-3 bg-[#e9e9eb] dark:bg-[#3a3a3c] w-fit rounded-[1.2rem] rounded-bl-sm">
                        <div className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" />
@@ -293,7 +290,6 @@ export default function SocialHubPage() {
                        <div className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce delay-200" />
                     </div>
                   )}
-                  
                   <div ref={messagesEndRef} />
                </div>
 
@@ -321,12 +317,49 @@ export default function SocialHubPage() {
                   </div>
                   <div className="h-4 sm:hidden"></div>
                </div>
-
-               {/* Desktop Home Indicator */}
-               <div className="hidden sm:block absolute bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-black/20 dark:bg-white/20 rounded-full pointer-events-none" />
-
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* 6. VIDEO PLAYER OVERLAY (NEW) */}
+      <AnimatePresence>
+        {showVideo && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-[#102222]/80 backdrop-blur-3xl"
+          >
+            {/* The Player Container */}
+            <div className="relative w-full max-w-5xl aspect-video bg-black rounded-3xl overflow-hidden shadow-[0_0_50px_-10px_rgba(19,236,236,0.3)] border border-[#13ecec]/30">
+               
+               {/* Close Button (Top Right) */}
+               <button 
+                 onClick={() => setShowVideo(false)}
+                 className="absolute top-4 right-4 z-20 size-10 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white border border-white/10 transition-colors backdrop-blur-md"
+               >
+                 <X size={20} />
+               </button>
+
+               {/* Video Header (Top Left) */}
+               <div className="absolute top-6 left-6 z-10 pointer-events-none">
+                 <span className="text-[10px] uppercase tracking-[0.2em] text-[#13ecec] font-bold block mb-1">Educational Series</span>
+                 <h4 className="text-sm md:text-base font-medium text-white/90 tracking-wide">The Mineral Science: Deep-Sea Ritual</h4>
+               </div>
+
+               {/* YouTube Iframe */}
+               <iframe 
+                 className="w-full h-full"
+                 src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`} 
+                 title="The Mineral Science" 
+                 frameBorder="0" 
+                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                 allowFullScreen
+               ></iframe>
+
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
