@@ -153,8 +153,8 @@ export default function SocialHubPage() {
                <PlayCircle size={32} className="text-[#13ecec] fill-[#13ecec]/20" />
              </div>
              <div className="flex flex-col grow">
-               <h3 className="text-lg font-bold">The Mineral Science</h3>
-               <p className="text-[#13ecec]/70 text-sm">Deep-sea education series</p>
+               <h3 className="text-lg font-bold">Bamboo Salt Source</h3>
+               <p className="text-[#13ecec]/70 text-sm">Mineral education series</p>
              </div>
           </button>
 
