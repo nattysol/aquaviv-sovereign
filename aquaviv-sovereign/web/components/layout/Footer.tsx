@@ -36,13 +36,13 @@ export function Footer() {
         
         {/* Brand Column */}
         <div className="md:col-span-4">
-           <h2 className="text-2xl font-black tracking-tighter mb-6 text-[#13ecec]">AQUAVIV</h2>
+           <h2 className="text-2xl font-black tracking-tighter mb-6 text-[#13ecec]">aquaViv</h2>
            <p className="text-slate-400 leading-relaxed mb-8 max-w-sm">
-             Sovereign hydration for the modern biologist. Pure, ionic minerals harvested from the pristine depths.
+             Cellular Hydration for optimised lifestyles. Pure, ionic minerals harvested from the pristine depths.
            </p>
            {/* Form */}
            <div className="max-w-xs">
-              <p className="text-xs font-bold uppercase tracking-widest mb-3 text-white">Join the Ritual</p>
+              <p className="text-xs font-bold uppercase tracking-widest mb-3 text-white">Join the Newletter</p>
               <form onSubmit={handleSubscribe} className="relative">
                  <input 
                    type="email" 
