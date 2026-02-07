@@ -63,8 +63,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const toggleCart = () => setIsOpen(!isOpen);
 
   async function addToCart(rawVariantId: string | number, quantity: number) {
-    // 1. Debug Log: See if the button click is even registering
-    console.log("Adding to cart:", rawVariantId, quantity);
     
     setIsLoading(true);
     const variantId = formatId(rawVariantId);

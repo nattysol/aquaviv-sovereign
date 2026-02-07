@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
   // Replace with your actual production domain when ready
-  const baseUrl = 'https://aquaviv-sovereign.vercel.app';
+  const baseUrl = 'https://aquaviv.net';
 
   return {
     rules: [

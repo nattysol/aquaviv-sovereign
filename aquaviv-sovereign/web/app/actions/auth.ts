@@ -2,13 +2,8 @@
 
 import { cookies } from 'next/headers';
 
-// Debug: Log the config being used
 const SHOPIFY_DOMAIN = process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN || 'aquaviv.myshopify.com'; 
 const SHOPIFY_STOREFRONT_TOKEN = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN;
-
-console.log("--- AUTH DEBUG START ---");
-console.log("Domain:", SHOPIFY_DOMAIN);
-console.log("Token Present:", !!SHOPIFY_STOREFRONT_TOKEN); // Don't log the actual token for safety
 
 const CUSTOMER_ACCESS_TOKEN_CREATE = `
   mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {

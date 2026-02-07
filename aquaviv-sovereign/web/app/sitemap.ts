@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { client } from '@/sanity/lib/client';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://aquaviv-sovereign.vercel.app';
+  const baseUrl = 'https://aquaviv.net';
 
   // 1. Fetch all product slugs from Sanity
   const products = await client.fetch(`*[_type == "product"] { "slug": slug.current, _updatedAt }`);
