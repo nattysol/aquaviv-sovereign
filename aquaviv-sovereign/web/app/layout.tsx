@@ -12,6 +12,7 @@ import { KLAVIYO_SCRIPT_URL } from '@/lib/klaviyo';
 import { Navbar } from '@/components/layout/Navbar';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { Footer } from '@/components/layout/Footer';
+import { PageShell } from '@/components/layout/PageShell';
 
 const manrope = Manrope({ subsets: ['latin'] });
 
@@ -31,6 +32,8 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <ReferralProvider>
             <CartProvider>
+              {/* THE FIX: Wrap everything in the PageShell */}
+              <PageShell>
               <Navbar />
               {/* 2. PLACE THE DRAWER HERE (It is invisible until isOpen=true) */}
               <CartDrawer />
@@ -38,9 +41,11 @@ export default function RootLayout({
               <main className="min-h-screen">
                 {children}
               </main>
+              </PageShell>
 {/* 2. PLACE IT HERE (Outside Main) */}
               <MobileBottomNav />
               <Footer />
+              
               <GoogleAnalytics />
               <Script 
                 id="klaviyo-init"
