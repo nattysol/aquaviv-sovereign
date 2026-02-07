@@ -5,6 +5,7 @@ import { KlaviyoTracker } from '@/components/KlaviyoTracker'; // Tracks "Viewed 
 import { RichText } from '@/components/ui/RichText'; // Beautiful Typography
 import { Star, ChevronDown, Droplet, Activity, ShieldCheck, Leaf, FlaskConical, AlertCircle } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
+import { Metadata } from 'next'; // Import Metadata type
 
 // 1. THE MASTER QUERY
 const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0] {
@@ -52,6 +53,37 @@ const PRODUCT_BY_SLUG_QUERY = `*[_type == "product" && slug.current == $slug][0]
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+// 1. ADD THIS FUNCTION
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  
+  // Quick fetch just for SEO (Lightweight)
+  const product = await client.fetch(
+    `*[_type == "product" && slug.current == $slug][0]{ 
+      title, 
+      tagline, 
+      "imageUrl": mainImage.asset->url 
+    }`, 
+    { slug }
+  );
+
+  if (!product) {
+    return {
+      title: 'Product Not Found',
+    };
+  }
+
+  return {
+    title: `${product.title} | aquaViv Minerals`,
+    description: product.tagline || 'Clinical grade cellular hydration.',
+    openGraph: {
+      title: product.title,
+      description: product.tagline,
+      images: [product.imageUrl || '/images/og-default.jpg'], // Fallback image
+    },
+  };
 }
 
 export default async function ProductPage({ params }: PageProps) {
