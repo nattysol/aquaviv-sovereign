@@ -241,11 +241,14 @@ export default function SocialHubPage() {
                        <span className="text-lg">Back</span>
                      </button>
                      <div className="flex flex-col items-center">
-                        <div className="size-10 rounded-full border border-[#13ecec] overflow-hidden mb-1">
-                           <div className="w-full h-full bg-[#102222] flex items-center justify-center">
-                              <span className="text-[#13ecec] text-[8px] font-bold tracking-widest">AV</span>
-                           </div>
-                        </div>
+                        <div className="size-10 rounded-full border border-[#13ecec] overflow-hidden mb-1 relative">
+   <Image 
+     src="/icon.webp" 
+     alt="Concierge Avatar" 
+     fill 
+     className="object-cover" 
+   />
+</div>
                         <span className="text-[11px] font-bold text-gray-500 dark:text-[#13ecec]/60 uppercase tracking-tighter">aquaViv Support</span>
                      </div>
                      <Info size={24} className="text-[#007aff]" />
@@ -303,7 +306,7 @@ export default function SocialHubPage() {
                        value={inputValue}
                        onChange={(e) => setInputValue(e.target.value)}
                        onKeyDown={handleKeyDown}
-                       placeholder="iMessage"
+                       placeholder="Live Chat"
                        className="flex-1 bg-transparent border-none focus:ring-0 text-base p-0 text-black dark:text-white placeholder-gray-400 outline-none"
                      />
                      <button 

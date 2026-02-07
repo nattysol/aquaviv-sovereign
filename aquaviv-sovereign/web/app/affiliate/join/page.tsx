@@ -63,9 +63,6 @@ export default function AffiliateLoginPage() {
       >
         <div className="absolute top-10 left-12 xl:left-24 flex items-center gap-3">
           <div className="w-8 h-8 text-[#13ecec]">
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor"></path>
-            </svg>
           </div>
           <h2 className="text-2xl font-bold tracking-tight">aquaViv <span className="opacity-50 font-normal">| Partners</span></h2>
         </div>
