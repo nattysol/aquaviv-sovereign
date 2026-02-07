@@ -1,103 +1,109 @@
 'use client';
 
+import { useState } from 'react';
 import { FadeIn } from '@/components/ui/FadeIn';
-import { Mail, MapPin, MessageSquare } from 'lucide-react';
 
 export default function ContactPage() {
+  const [formData, setFormData] = useState({ name: '', email: '', subject: 'General', message: '' });
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        setStatus('success');
+        setFormData({ name: '', email: '', subject: 'General', message: '' });
+      } else {
+        setStatus('error');
+      }
+    } catch (err) {
+      setStatus('error');
+    }
+  };
+
+  // FIXED: Added HTMLSelectElement to the type definition
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   return (
-    <main className="bg-surface-light min-h-screen pt-32 pb-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f6f8f8] pt-32 pb-20 px-6">
+      <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-start">
         
-        <div className="grid lg:grid-cols-2 gap-16">
-          
-          {/* Contact Info */}
-          <div>
-            <FadeIn>
-              <h1 className="text-4xl font-black text-slate-900 mb-6">Contact aquaViv</h1>
-              <p className="text-lg text-slate-500 mb-10 leading-relaxed">
-                Whether you have questions about your protocol, wholesale inquiries, or partnership opportunities, our team is ready to assist.
+        {/* Left: Info */}
+        <FadeIn>
+          <h1 className="text-4xl font-black text-[#102222] mb-6">Contact Us</h1>
+          <p className="text-slate-600 text-lg mb-8 leading-relaxed">
+            Questions about your protocol? Need help with an order? Our support team operates on high-frequency channels.
+          </p>
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-bold text-[#102222]">Email</h3>
+              <p className="text-slate-500">support@aquaviv.net</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-[#102222]">Headquarters</h3>
+              <p className="text-slate-500">
+                123 Mineral Way<br />
+                Austin, TX 78701
               </p>
-
-              <div className="space-y-8">
-                <ContactItem 
-                  icon={<Mail className="w-6 h-6 text-accent" />}
-                  title="Support Protocol"
-                  content="hello@aquaviv.net"
-                  sub="Response within 24 hours"
-                />
-                <ContactItem 
-                  icon={<MessageSquare className="w-6 h-6 text-primary" />}
-                  title="Wholesale & Partners"
-                  content="hello@aquaviv.net"
-                  sub="Join aquaViv network"
-                />
-                <ContactItem 
-                  icon={<MapPin className="w-6 h-6 text-slate-900" />}
-                  title="Headquarters"
-                  content="Las Vegas, NV"
-                  sub="United States"
-                />
-              </div>
-            </FadeIn>
+            </div>
           </div>
+        </FadeIn>
 
-          {/* Contact Form */}
-          <FadeIn delay={0.2} className="bg-white p-8 md:p-10 rounded-3xl border border-slate-100 shadow-xl">
-             <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-               <div className="grid grid-cols-2 gap-6">
-                 <div className="space-y-2">
-                   <label className="text-sm font-bold text-slate-700">First Name</label>
-                   <input type="text" className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all" placeholder="John" />
-                 </div>
-                 <div className="space-y-2">
-                   <label className="text-sm font-bold text-slate-700">Last Name</label>
-                   <input type="text" className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all" placeholder="Doe" />
-                 </div>
-               </div>
+        {/* Right: Form */}
+        <FadeIn delay={0.2}>
+          <form onSubmit={handleSubmit} className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+            {status === 'success' ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-[#13ecec]/20 text-[#102222] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">✓</span>
+                </div>
+                <h3 className="text-xl font-bold text-[#102222]">Message Transmitted</h3>
+                <p className="text-slate-500 mt-2">We will respond within 24 hours.</p>
+                <button type="button" onClick={() => setStatus('idle')} className="mt-6 text-[#1152d4] font-bold text-sm underline">Send another</button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Name</label>
+                  <input required name="name" value={formData.name} onChange={handleChange} className="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#13ecec] outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Email</label>
+                  <input required name="email" type="email" value={formData.email} onChange={handleChange} className="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#13ecec] outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Subject</label>
+                  <select name="subject" value={formData.subject} onChange={handleChange} className="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#13ecec] outline-none">
+                    <option value="General">General Inquiry</option>
+                    <option value="Order">Order Support</option>
+                    <option value="Wholesale">Wholesale / Partnership</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Message</label>
+                  <textarea required name="message" rows={4} value={formData.message} onChange={handleChange} className="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#13ecec] outline-none" />
+                </div>
 
-               <div className="space-y-2">
-                 <label className="text-sm font-bold text-slate-700">Email Address</label>
-                 <input type="email" className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all" placeholder="john@example.com" />
-               </div>
+                <button disabled={status === 'loading'} className="w-full py-4 bg-[#102222] text-white font-bold rounded-xl hover:bg-black transition-all mt-2">
+                  {status === 'loading' ? 'Sending...' : 'Send Message'}
+                </button>
+                {status === 'error' && <p className="text-center text-red-500 text-xs font-bold">Failed to send. Please try again.</p>}
+              </div>
+            )}
+          </form>
+        </FadeIn>
 
-               <div className="space-y-2">
-                 <label className="text-sm font-bold text-slate-700">Topic</label>
-                 <select className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all">
-                   <option>General Inquiry</option>
-                   <option>Order Support</option>
-                   <option>Wholesale / Partnership</option>
-                   <option>Product Question</option>
-                 </select>
-               </div>
-
-               <div className="space-y-2">
-                 <label className="text-sm font-bold text-slate-700">Message</label>
-                 <textarea rows={4} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all" placeholder="How can we help you?" />
-               </div>
-
-               <button className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-primary/20">
-                 Send Message
-               </button>
-             </form>
-          </FadeIn>
-
-        </div>
-      </div>
-    </main>
-  );
-}
-
-function ContactItem({ icon, title, content, sub }: { icon: any, title: string, content: string, sub: string }) {
-  return (
-    <div className="flex items-start gap-4">
-      <div className="w-12 h-12 rounded-full bg-white border border-slate-100 flex items-center justify-center shadow-sm shrink-0">
-        {icon}
-      </div>
-      <div>
-        <h3 className="font-bold text-slate-900">{title}</h3>
-        <p className="text-slate-900 font-medium">{content}</p>
-        <p className="text-sm text-slate-400">{sub}</p>
       </div>
     </div>
-  )
+  );
 }
