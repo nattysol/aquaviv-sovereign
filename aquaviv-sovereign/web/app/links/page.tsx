@@ -108,7 +108,7 @@ export default function SocialHubPage() {
             <div className="absolute -inset-1 bg-[#13ecec] rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
             <div className="relative size-28 rounded-full border-4 border-white dark:border-[#102222] shadow-xl overflow-hidden bg-slate-100">
                <Image 
-      src="/icon.svg" 
+      src="/icon.webp" 
       alt="aquaViv Logo" 
       fill 
       className="object-cover" 
