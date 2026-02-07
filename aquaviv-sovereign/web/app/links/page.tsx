@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { 
   Check, ArrowRight, PlayCircle, MessageCircle, Star, 
-  HelpCircle, Mail, Leaf, Camera, ArrowUp, ChevronLeft, Info, X
+  HelpCircle, Camera, ArrowUp, ChevronLeft, Info
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -28,8 +28,8 @@ export default function SocialHubPage() {
             <div className="absolute -inset-1 bg-[#13ecec] rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
             <div className="relative size-28 rounded-full border-4 border-white dark:border-[#102222] shadow-xl overflow-hidden bg-slate-100">
                {/* Replace with your actual Logo/Profile Image */}
-               <div className="w-full h-full bg-[#102222] flex items-center justify-center text-[#13ecec]">
-                  <span className="font-bold text-xs tracking-widest">AQUAVIV</span>
+               <div className="w-full h-full bg-[#102222] flex items-center justify-center">
+                  <span className="text-[#13ecec] text-[10px] font-bold tracking-widest">AQUAVIV</span>
                </div>
             </div>
             <div className="absolute bottom-1 right-1 bg-[#13ecec] text-[#0d1b1b] rounded-full p-1 border-2 border-white dark:border-[#102222] flex items-center justify-center">
@@ -108,6 +108,17 @@ export default function SocialHubPage() {
              </div>
           </Link>
 
+          {/* E. QUIZ */}
+          <Link href="/quiz" className="group flex items-center gap-4 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-md p-5 shadow-sm border border-white/20 hover:scale-[1.02] transition-transform duration-300">
+             <div className="flex-shrink-0 w-14 h-14 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center">
+               <HelpCircle size={24} className="text-slate-600 dark:text-white" />
+             </div>
+             <div className="flex flex-col grow">
+               <h3 className="text-lg font-bold text-[#0d1b1b] dark:text-white">Hydration Quiz</h3>
+               <p className="text-slate-500 text-sm">Find your optimal balance</p>
+             </div>
+          </Link>
+
         </main>
 
         {/* 4. FOOTER */}
@@ -126,28 +137,36 @@ export default function SocialHubPage() {
 
       </div>
 
-      {/* 5. IOS CHAT OVERLAY */}
+      {/* 5. IOS CHAT OVERLAY (Responsive Fix) */}
       <AnimatePresence>
         {showChat && (
           <>
-            {/* Dim Backdrop */}
+            {/* Dim Backdrop (Desktop Only - Mobile covers screen) */}
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setShowChat(false)}
-              className="fixed inset-0 bg-[#102222]/40 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-[#102222]/40 backdrop-blur-sm z-40 hidden sm:block"
             />
             
             {/* The Messenger Window */}
             <motion.div 
+              // Animation: Slide up
               initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed bottom-6 w-[95%] max-w-[400px] h-[80vh] bg-[#fff] dark:bg-[#1c2a2a] rounded-[2.5rem] z-50 flex flex-col shadow-2xl overflow-hidden border border-white/20 left-1/2 -translate-x-1/2"
+              
+              // RESPONSIVE LAYOUT:
+              // Mobile: inset-0, h-[100dvh], no rounding (Full Screen)
+              // Desktop: bottom-6, floating card, rounded (Widget)
+              className="fixed z-50 flex flex-col overflow-hidden bg-[#fff] dark:bg-[#1c2a2a] shadow-2xl
+                         inset-0 w-full h-[100dvh] rounded-none
+                         sm:inset-auto sm:bottom-6 sm:left-1/2 sm:-translate-x-1/2 sm:w-[95%] sm:max-w-[400px] sm:h-[80vh] sm:rounded-[2.5rem] sm:border sm:border-white/20"
             >
                {/* iOS Header */}
-               <div className="bg-white/80 dark:bg-[#1c2a2a]/80 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-6 py-4 flex flex-col items-center relative z-10">
+               <div className="bg-white/80 dark:bg-[#1c2a2a]/80 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-6 py-4 flex flex-col items-center relative z-10 shrink-0">
                   <div className="flex items-center justify-between w-full">
-                     <button onClick={() => setShowChat(false)} className="text-[#007aff] flex items-center">
-                       <ChevronLeft size={24} /> 
+                     <button onClick={() => setShowChat(false)} className="text-[#007aff] flex items-center group">
+                       <ChevronLeft size={26} className="group-active:-translate-x-1 transition-transform" /> 
+                       <span className="text-lg">Back</span>
                      </button>
                      <div className="flex flex-col items-center">
                         <div className="size-10 rounded-full border border-[#13ecec] overflow-hidden mb-1">
@@ -163,17 +182,17 @@ export default function SocialHubPage() {
                </div>
 
                {/* Messages Area */}
-               <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-white dark:bg-[#1c2a2a]">
+               <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-white dark:bg-[#1c2a2a] scroll-smooth">
                   <div className="text-center pt-2">
                      <span className="text-[11px] font-bold text-gray-400 dark:text-white/30 uppercase tracking-widest">Today 10:42 AM</span>
                   </div>
                   
-                  {/* Message 1 (Bot - Gray) */}
+                  {/* Message 1 (Bot) */}
                   <div className="self-start max-w-[85%] bg-[#e9e9eb] dark:bg-[#3a3a3c] text-black dark:text-white px-4 py-2.5 rounded-[1.2rem] rounded-bl-sm text-sm leading-tight">
                      Welcome to the Ritual. Need help with your order or protocol?
                   </div>
 
-                  {/* Message 2 (User - Blue) */}
+                  {/* Message 2 (User) */}
                   <div className="flex flex-col items-end gap-1 self-end max-w-[85%]">
                      <div className="bg-[#007aff] text-white px-4 py-2.5 rounded-[1.2rem] rounded-br-sm text-sm leading-tight shadow-sm">
                         Hi! I'm interested in the Mineral Science series.
@@ -190,23 +209,24 @@ export default function SocialHubPage() {
                </div>
 
                {/* Input Area */}
-               <div className="p-4 bg-white dark:bg-[#1c2a2a] border-t border-black/5 dark:border-white/5">
+               <div className="p-4 bg-white dark:bg-[#1c2a2a] border-t border-black/5 dark:border-white/5 shrink-0 pb-8 sm:pb-4">
                   <div className="flex items-center gap-2 bg-[#f2f2f7] dark:bg-white/5 rounded-full px-4 py-2 border border-black/5 dark:border-white/10">
-                     <Camera size={20} className="text-gray-400 dark:text-white/40" />
+                     <Camera size={24} className="text-gray-400 dark:text-white/40 shrink-0" />
                      <input 
                        type="text" 
                        placeholder="iMessage"
-                       className="flex-1 bg-transparent border-none focus:ring-0 text-sm p-0 text-black dark:text-white placeholder-gray-400 outline-none"
+                       className="flex-1 bg-transparent border-none focus:ring-0 text-base p-0 text-black dark:text-white placeholder-gray-400 outline-none"
                      />
-                     <div className="size-7 bg-[#007aff] rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-blue-600 transition-colors">
-                        <ArrowUp size={14} strokeWidth={3} />
+                     <div className="size-8 bg-[#007aff] rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-blue-600 transition-colors shrink-0">
+                        <ArrowUp size={16} strokeWidth={3} />
                      </div>
                   </div>
-                  <div className="h-2"></div>
+                  {/* Extra space at bottom on mobile for gesture bar */}
+                  <div className="h-4 sm:hidden"></div>
                </div>
 
-               {/* Home Indicator */}
-               <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-black/20 dark:bg-white/20 rounded-full pointer-events-none" />
+               {/* Desktop Home Indicator */}
+               <div className="hidden sm:block absolute bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-black/20 dark:bg-white/20 rounded-full pointer-events-none" />
 
             </motion.div>
           </>
