@@ -9,10 +9,10 @@ import { CartDrawer } from '@/components/cart/CartDrawer';
 export function PageShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   
-  // Logic: Is this the standalone "Links" page?
+  // 1. Detect if we are on the hidden "Links" page
   const isStandalone = pathname?.startsWith('/links');
 
-  // If yes, return ONLY the content (clean slate)
+  // 2. If YES, return ONLY the content (No Nav, No Footer)
   if (isStandalone) {
     return (
       <main className="min-h-screen">
@@ -21,7 +21,7 @@ export function PageShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // If no, return the full website experience
+  // 3. If NO (Normal Website), return the Full Experience
   return (
     <>
       <Navbar />

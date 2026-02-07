@@ -4,15 +4,14 @@ import './globals.css';
 import { Suspense } from 'react';
 import Script from 'next/script';
 
+// Providers
 import { CartProvider } from '@/components/providers/CartContext';
-import { CartDrawer } from '@/components/cart/CartDrawer'; // <--- 1. Import This
 import { ReferralProvider } from '@/components/providers/ReferralContext';
+
+// Components
+import { PageShell } from '@/components/layout/PageShell'; // <--- The only layout component we keep
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { KLAVIYO_SCRIPT_URL } from '@/lib/klaviyo';
-import { Navbar } from '@/components/layout/Navbar';
-import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
-import { Footer } from '@/components/layout/Footer';
-import { PageShell } from '@/components/layout/PageShell';
 
 const manrope = Manrope({ subsets: ['latin'] });
 
@@ -32,26 +31,21 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <ReferralProvider>
             <CartProvider>
-              {/* THE FIX: Wrap everything in the PageShell */}
-              <PageShell>
-              <Navbar />
-              {/* 2. PLACE THE DRAWER HERE (It is invisible until isOpen=true) */}
-              <CartDrawer />
-              {/* REMOVED: pt-20. Now the Homepage Hero will sit perfectly at the top. */}
-              <main className="min-h-screen">
-                {children}
-              </main>
-              </PageShell>
-{/* 2. PLACE IT HERE (Outside Main) */}
-              <MobileBottomNav />
-              <Footer />
               
+              {/* --- THE FIX: ONLY USE PAGESHELL --- */}
+              {/* It automatically decides whether to show the Navbar/Footer or not. */}
+              <PageShell>
+                {children}
+              </PageShell>
+              
+              {/* Analytics stay global */}
               <GoogleAnalytics />
               <Script 
                 id="klaviyo-init"
                 strategy="afterInteractive"
                 src={KLAVIYO_SCRIPT_URL}
               />
+              
             </CartProvider>
           </ReferralProvider>
         </Suspense>
