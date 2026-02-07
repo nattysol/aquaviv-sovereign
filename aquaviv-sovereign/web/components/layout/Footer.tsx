@@ -76,8 +76,7 @@ export function Footer() {
         <div className="md:col-span-2">
            <h3 className="font-bold mb-6">Company</h3>
            <ul className="space-y-4 text-slate-400 text-sm">
-             <li><Link href="/science" className="hover:text-[#13ecec]">Our Science</Link></li>
-             <li><Link href="/about" className="hover:text-[#13ecec]">Manifesto</Link></li>
+             <li><Link href="/about" className="hover:text-[#13ecec]">Our Science</Link></li>
              <li><Link href="/contact" className="hover:text-[#13ecec]">Contact</Link></li>
            </ul>
         </div>
