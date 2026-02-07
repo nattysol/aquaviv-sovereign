@@ -165,7 +165,26 @@ export default async function ProductPage({ params }: PageProps) {
   return (
     // ADDED: pt-24 lg:pt-28 (This pushes the content below the navbar)
   <main className="min-h-screen bg-surface-light text-slate-900 pb-24 pt-16 lg:pt-28">
-      
+      <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: product.title,
+      description: product.tagline,
+      image: product.mainImage?.asset?.url,
+      offers: {
+        '@type': 'Offer',
+        price: product.price,
+        priceCurrency: 'USD',
+        availability: product.store?.inventory?.isAvailable 
+          ? 'https://schema.org/InStock' 
+          : 'https://schema.org/OutOfStock',
+      },
+    }),
+  }}
+/>
       {/* 1. KLAVIYO TRACKING (Invisible) */}
       <KlaviyoTracker product={product} />
 
