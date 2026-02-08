@@ -6,12 +6,12 @@ import Image from 'next/image';
 import { 
   Check, ArrowRight, PlayCircle, MessageCircle, Star, 
   HelpCircle, Camera, ArrowUp, ChevronLeft, Info, X,
-  Instagram
+  Instagram, Sparkles
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 // --- CONFIGURATION ---
-const YOUTUBE_VIDEO_ID = "NoJwmTojdWk"; // Replace with your video ID
+const YOUTUBE_VIDEO_ID = "NoJwmTojdWk"; 
 
 // --- TYPES ---
 type Message = {
@@ -26,24 +26,25 @@ export default function SocialHubPage() {
   const [showVideo, setShowVideo] = useState(false);
   
   // --- LEAD CAPTURE STATE ---
-  // 0 = Ask Name, 1 = Ask Email, 2 = AI Chat Mode
+  // 0 = Ask Name, 1 = Ask Email (Optional), 2 = AI Chat Mode
   const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2>(0); 
   const [userData, setUserData] = useState({ name: '', email: '' });
 
   // --- CHAT STATE ---
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  
+  // 1. UPDATED INITIAL MESSAGE
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Welcome to the Ritual. To begin, what is your first name?",
+      text: "Welcome to aquaViv. Before we begin, what is your first name?",
       sender: 'bot',
     }
   ]);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     if (showChat) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -55,9 +56,9 @@ export default function SocialHubPage() {
     if (!inputValue.trim() || isTyping) return;
 
     const userText = inputValue.trim();
-    setInputValue(""); // Clear input immediately
+    setInputValue(""); 
     
-    // 1. Always add user message to UI immediately
+    // Add user message
     const newUserMsg: Message = {
       id: Date.now().toString(),
       text: userText,
@@ -73,29 +74,12 @@ export default function SocialHubPage() {
       setTimeout(() => {
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
-          text: `Nice to meet you, ${userText}. What is your email address?`,
+          text: `Welcome, ${userText}. How may I assist your hydration goals?`, // <--- BRAND VOICE
           sender: 'bot'
         }]);
-        setOnboardingStep(1);
+        setOnboardingStep(2); // Skip email for now to get straight to value (or set to 1 if you want email)
         setIsTyping(false);
-      }, 600); // Fake delay for realism
-      return;
-    }
-
-    // --- STEP 1: CAPTURE EMAIL ---
-    if (onboardingStep === 1) {
-      setUserData(prev => ({ ...prev, email: userText }));
-      setIsTyping(true);
-      
-      setTimeout(() => {
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          text: "Perfect. How can we help with your hydration journey?",
-          sender: 'bot'
-        }]);
-        setOnboardingStep(2); // <--- UNLOCKS AI MODE
-        setIsTyping(false);
-      }, 600);
+      }, 800);
       return;
     }
 
@@ -104,15 +88,13 @@ export default function SocialHubPage() {
     try {
       const botMsgId = (Date.now() + 1).toString();
       
-      // Add placeholder for bot response
       setMessages(prev => [...prev, {
         id: botMsgId,
-        text: "", // Starts empty
+        text: "", 
         sender: 'bot'
       }]);
 
-      // Prepare History for AI (Exclude the onboarding steps if you want, or keep them)
-      // Here we keep everything so the AI knows the user's name
+      // Prepare History
       const chatHistory = messages.map(m => ({
         role: m.sender === 'user' ? 'user' : 'assistant',
         content: m.text
@@ -122,14 +104,13 @@ export default function SocialHubPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          userData: userData, // <--- Send captured leads to backend
-          messages: chatHistory
+          messages: chatHistory,
+          userName: userData.name // <--- PASS NAME TO AI
         }),
       });
 
       if (!response.ok || !response.body) throw new Error("Connection error");
 
-      // STREAM READER logic
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let done = false;
@@ -139,7 +120,6 @@ export default function SocialHubPage() {
         done = doneReading;
         const chunkValue = decoder.decode(value, { stream: !done });
         
-        // Update the SPECIFIC bot message in state
         setMessages(prev => prev.map(msg => 
           msg.id === botMsgId ? { ...msg, text: msg.text + chunkValue } : msg
         ));
@@ -164,7 +144,7 @@ export default function SocialHubPage() {
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden flex flex-col items-center bg-[#f6f8f8] dark:bg-[#102222] transition-colors duration-300 font-sans">
       
-      {/* 1. BACKGROUND GLOW EFFECTS */}
+      {/* BACKGROUND EFFECTS */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#13ecec]/10 rounded-full blur-[100px]" />
         <div className="absolute top-1/2 -right-24 w-80 h-80 bg-[#13ecec]/20 rounded-full blur-[100px]" />
@@ -172,7 +152,7 @@ export default function SocialHubPage() {
 
       <div className="relative z-10 w-full max-w-[540px] px-6 py-12 flex flex-col gap-6">
         
-        {/* 2. HEADER */}
+        {/* HEADER */}
         <header className="flex flex-col items-center gap-4 text-center mb-4">
           <div className="relative group cursor-pointer">
             <div className="absolute -inset-1 bg-[#13ecec] rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
@@ -189,11 +169,10 @@ export default function SocialHubPage() {
           </div>
         </header>
 
-        {/* 3. CARD STACK */}
+        {/* LINKS STACK */}
         <main className="flex flex-col gap-4">
           <Link href="/shop" className="group relative block h-40 w-full overflow-hidden rounded-2xl bg-[#13ecec] shadow-lg hover:scale-[1.02] transition-transform duration-300">
             <div className="absolute inset-0 bg-gradient-to-tr from-[#13ecec] to-[#0d9d9d] opacity-100" />
-            <div className="absolute inset-0 bg-black/10" />
             <div className="relative h-full flex items-end justify-between p-6">
               <div className="flex flex-col">
                 <span className="text-xs font-bold uppercase tracking-widest text-[#0d1b1b]/60 mb-1">New Drop</span>
@@ -219,16 +198,17 @@ export default function SocialHubPage() {
           <button onClick={() => setShowChat(true)} className="relative group flex items-center gap-4 rounded-2xl bg-white dark:bg-[#1a3a3a] p-5 shadow-sm border-2 border-[#13ecec] hover:scale-[1.02] transition-transform duration-300 text-left w-full">
              <div className="absolute -inset-1 bg-[#13ecec]/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
              <div className="relative flex-shrink-0 w-14 h-14 rounded-full bg-[#13ecec] flex items-center justify-center">
-               <MessageCircle size={24} className="text-[#0d1b1b] fill-current" />
+               <Sparkles size={24} className="text-[#0d1b1b] fill-current" />
              </div>
              <div className="relative flex flex-col grow">
-               <h3 className="text-lg font-bold text-[#0d1b1b] dark:text-white">Contact Support</h3>
+               {/* 2. UPDATED BUTTON LABEL */}
+               <h3 className="text-lg font-bold text-[#0d1b1b] dark:text-white">Ask Your Hydration Coach</h3>
                <p className="text-[#13ecec] font-bold text-sm flex items-center gap-2">
                  <span className="relative flex h-2 w-2">
                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#13ecec] opacity-75"></span>
                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#13ecec]"></span>
                  </span>
-                 Active Session
+                 Online Now
                </p>
              </div>
           </button>
@@ -238,18 +218,8 @@ export default function SocialHubPage() {
                <Star size={24} className="text-[#4c9a9a] fill-current" />
              </div>
              <div className="flex flex-col grow">
-               <h3 className="text-lg font-bold text-[#0d1b1b] dark:text-white">Sovereign Rewards</h3>
-               <p className="text-slate-500 text-sm">Unlock exclusive benefits (Free)</p>
-             </div>
-          </Link>
-
-          <Link href="/quiz" className="group flex items-center gap-4 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-md p-5 shadow-sm border border-white/20 hover:scale-[1.02] transition-transform duration-300">
-             <div className="flex-shrink-0 w-14 h-14 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center">
-               <HelpCircle size={24} className="text-slate-600 dark:text-white" />
-             </div>
-             <div className="flex flex-col grow">
-               <h3 className="text-lg font-bold text-[#0d1b1b] dark:text-white">Hydration Quiz</h3>
-               <p className="text-slate-500 text-sm">Find your optimal balance</p>
+               <h3 className="text-lg font-bold text-[#0d1b1b] dark:text-white">Loyalty Rewards</h3>
+               <p className="text-slate-500 text-sm">Unlock exclusive benefits</p>
              </div>
           </Link>
         </main>
@@ -264,7 +234,7 @@ export default function SocialHubPage() {
         </footer>
       </div>
 
-      {/* 5. IOS CHAT OVERLAY */}
+      {/* CHAT OVERLAY */}
       <AnimatePresence>
         {showChat && (
           <>
@@ -281,7 +251,7 @@ export default function SocialHubPage() {
                          inset-0 w-full h-[100dvh] rounded-none
                          sm:inset-auto sm:bottom-6 sm:left-1/2 sm:-translate-x-1/2 sm:w-[95%] sm:max-w-[400px] sm:h-[80vh] sm:rounded-[2.5rem] sm:border sm:border-white/20"
             >
-               {/* iOS Header */}
+               {/* 3. UPDATED HEADER */}
                <div className="bg-white/80 dark:bg-[#1c2a2a]/80 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-6 py-4 flex flex-col items-center relative z-10 shrink-0">
                   <div className="flex items-center justify-between w-full">
                      <button onClick={() => setShowChat(false)} className="text-[#007aff] flex items-center group">
@@ -289,23 +259,18 @@ export default function SocialHubPage() {
                        <span className="text-lg">Back</span>
                      </button>
                      <div className="flex flex-col items-center">
-                        <div className="size-10 rounded-full border border-[#13ecec] overflow-hidden mb-1 relative">
-                           <Image src="/icon.webp" alt="Concierge Avatar" fill className="object-cover" />
+                        <div className="size-10 rounded-full border border-[#13ecec] overflow-hidden mb-1 relative bg-[#102222] flex items-center justify-center text-[#13ecec]">
+                           <Sparkles size={18} />
                         </div>
-                        <span className="text-[11px] font-bold text-gray-500 dark:text-[#13ecec]/60 uppercase tracking-tighter">aquaViv Support</span>
+                        <span className="text-[11px] font-bold text-gray-500 dark:text-[#13ecec]/60 uppercase tracking-tighter">Sovereign Intelligence</span>
                      </div>
                      <Info size={24} className="text-[#007aff]" />
                   </div>
-                  <h4 className="text-sm font-bold text-[#0d1b1b] dark:text-white mt-1">The Ritual Concierge</h4>
+                  <h4 className="text-sm font-bold text-[#0d1b1b] dark:text-white mt-1">Your Hydration Coach</h4>
                </div>
 
                {/* Messages Area */}
                <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-white dark:bg-[#1c2a2a] scroll-smooth">
-                  <div className="text-center pt-2">
-                     <span className="text-[11px] font-bold text-gray-400 dark:text-white/30 uppercase tracking-widest">
-                       Today {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                     </span>
-                  </div>
                   
                   {messages.map((msg) => (
                     <div 
@@ -315,13 +280,10 @@ export default function SocialHubPage() {
                        <div className={`px-4 py-2.5 text-sm leading-tight shadow-sm ${msg.sender === 'user' ? 'bg-[#007aff] text-white rounded-[1.2rem] rounded-br-sm' : 'bg-[#e9e9eb] dark:bg-[#3a3a3c] text-black dark:text-white rounded-[1.2rem] rounded-bl-sm'}`}>
                           {msg.text}
                        </div>
-                       {msg.sender === 'user' && (
-                         <span className="text-[10px] text-gray-400 mr-1 mt-1">Delivered</span>
-                       )}
                     </div>
                   ))}
 
-                  {isTyping && !messages[messages.length - 1]?.text && (
+                  {isTyping && (
                     <div className="flex items-center gap-1.5 px-4 py-3 bg-[#e9e9eb] dark:bg-[#3a3a3c] w-fit rounded-[1.2rem] rounded-bl-sm">
                        <div className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" />
                        <div className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce delay-100" />
@@ -340,8 +302,7 @@ export default function SocialHubPage() {
                        value={inputValue}
                        onChange={(e) => setInputValue(e.target.value)}
                        onKeyDown={handleKeyDown}
-                       // DYNAMIC PLACEHOLDER BASED ON STEP
-                       placeholder={onboardingStep === 0 ? "Enter your Name..." : onboardingStep === 1 ? "Enter your Email..." : "Ask anything..."}
+                       placeholder={onboardingStep === 0 ? "Enter your Name..." : "Ask anything..."}
                        className="flex-1 bg-transparent border-none focus:ring-0 text-base p-0 text-black dark:text-white placeholder-gray-400 outline-none"
                      />
                      <button 
@@ -360,7 +321,7 @@ export default function SocialHubPage() {
         )}
       </AnimatePresence>
 
-      {/* 6. VIDEO PLAYER OVERLAY */}
+      {/* VIDEO PLAYER */}
       <AnimatePresence>
         {showVideo && (
           <motion.div 
@@ -371,10 +332,6 @@ export default function SocialHubPage() {
                <button onClick={() => setShowVideo(false)} className="absolute top-4 right-4 z-20 size-10 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white border border-white/10 transition-colors backdrop-blur-md">
                  <X size={20} />
                </button>
-               <div className="absolute top-6 left-6 z-10 pointer-events-none">
-                 <span className="text-[10px] uppercase tracking-[0.2em] text-[#13ecec] font-bold block mb-1">Educational Series</span>
-                 <h4 className="text-sm md:text-base font-medium text-white/90 tracking-wide">The Mineral Science: Deep-Sea Ritual</h4>
-               </div>
                <iframe className="w-full h-full" src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`} title="The Mineral Science" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
             </div>
           </motion.div>
