@@ -3,9 +3,7 @@ import { Manrope } from 'next/font/google';
 import './globals.css';
 import { Suspense } from 'react';
 import Script from 'next/script';
-import { ChatWidget } from '@/components/layout/ChatWidget';
-import { ChatProvider } from '@/components/providers/ChatContext';
-import { ChatModal } from '@/components/layout/ChatModal';
+import { ChatWidget } from '@/components/ai/ChatWidget';
 import { Toaster } from 'sonner'; // <--- 1. Import This
 
 // Providers
@@ -45,7 +43,6 @@ export default function RootLayout({
 }>
           <ReferralProvider>
             {/* 2. Wrap CartProvider inside ChatProvider (or vice versa, order doesn't matter much) */}
-            <ChatProvider>
             <CartProvider>
               
               {/* --- THE FIX: ONLY USE PAGESHELL --- */}
@@ -54,7 +51,6 @@ export default function RootLayout({
                 {children}
               </PageShell>
               {/* 2. PLACE CHAT WIDGET HERE (Above footer, below navs) */}
-              <ChatModal />
               {/* Analytics stay global */}
               <GoogleAnalytics />
               <Script 
@@ -65,7 +61,6 @@ export default function RootLayout({
               {/* 2. PLACE TOASTER HERE */}
               <Toaster position="top-center" richColors />
             </CartProvider>
-            </ChatProvider>
           </ReferralProvider>
         </Suspense>
       </body>
