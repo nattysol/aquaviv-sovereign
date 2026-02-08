@@ -78,7 +78,7 @@ export default function AffiliateLoginPage() {
               Monetize Your Influence.
             </h1>
             <p className="text-lg text-slate-300 mb-10 font-medium leading-relaxed">
-              Join the movement to restore biological sovereignty. Share clinical-grade minerals and earn premium commissions.
+              Join the movement to restore cellular hydration. Share clinical-grade minerals and earn premium commissions.
             </p>
 
             <div className="space-y-6">

@@ -97,7 +97,7 @@ defineField({
     }),
     defineField({
     name: 'proTip',
-    title: 'Ritual Pro Tip',
+    title: 'Pro Tip',
     type: 'text',
     rows: 3,
     description: 'A short, expert tip displayed inside the yellow box in the Ritual accordion.',

@@ -54,7 +54,7 @@ export function ProductForm({ basePrice }: { basePrice: number; shopName: string
         ) : (
           <>
             <ShoppingBag className="w-5 h-5" />
-            <span>Add to Ritual - ${(basePrice * quantity).toFixed(2)}</span>
+            <span>Add to Cart - ${(basePrice * quantity).toFixed(2)}</span>
           </>
         )}
       </button>

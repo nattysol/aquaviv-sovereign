@@ -101,7 +101,7 @@ export function ProductOptionSelector({ variants }: { variants: VariantOption[] 
           {isAdding ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Updating Ritual...</span>
+              <span>Updating Cart...</span>
             </>
           ) : (
             <>

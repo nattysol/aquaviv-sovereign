@@ -9,7 +9,7 @@ export default function RegisterPage() {
       <div className="max-w-md w-full bg-white p-8 md:p-12 rounded-2xl shadow-xl">
         <FadeIn>
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-[#102222]">Begin Your Ritual</h1>
+            <h1 className="text-3xl font-bold text-[#102222]">Create Your Account</h1>
             <p className="text-slate-500 mt-2">Create an account to track your orders and subscriptions.</p>
           </div>
 

@@ -32,7 +32,7 @@ export default async function ShopPage() {
               The Collection
             </span>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Sovereign Hydration
+              Advanced Cellular Hydration
             </h1>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
               Targeted protocols for energy, clarity, and cellular restoration. 

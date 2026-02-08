@@ -90,7 +90,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       setCart(newCart);
       setIsOpen(true);
-      toast.success("Added to your ritual"); // <--- Success Toast
+      toast.success("Added to your cart"); // <--- Success Toast
 
       // Optional: Track Klaviyo Event here if needed
       // try { trackKlaviyoEvent(...) } catch (e) {}

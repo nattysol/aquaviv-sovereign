@@ -18,8 +18,8 @@ import { KLAVIYO_SCRIPT_URL } from '@/lib/klaviyo';
 const manrope = Manrope({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'aquaViv | Sovereign Hydration',
-  description: 'Clinical grade minerals for biological sovereignty.',
+  title: 'aquaViv | Advanced Cellular Hydration',
+  description: 'Clinical grade minerals for cellular hydration.',
   icons: {
     icon: '/icon.svg',
   },

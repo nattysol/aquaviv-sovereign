@@ -262,7 +262,7 @@ export default function SocialHubPage() {
                         <div className="size-10 rounded-full border border-[#13ecec] overflow-hidden mb-1 relative bg-[#102222] flex items-center justify-center text-[#13ecec]">
                            <Sparkles size={18} />
                         </div>
-                        <span className="text-[11px] font-bold text-gray-500 dark:text-[#13ecec]/60 uppercase tracking-tighter">Sovereign Intelligence</span>
+                        <span className="text-[11px] font-bold text-gray-500 dark:text-[#13ecec]/60 uppercase tracking-tighter">Hydration Intelligence</span>
                      </div>
                      <Info size={24} className="text-[#007aff]" />
                   </div>

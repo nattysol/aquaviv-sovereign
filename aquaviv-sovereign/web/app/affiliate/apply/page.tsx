@@ -32,7 +32,7 @@ export default function AffiliateApply() {
       <div className="max-w-xl mx-auto">
         <FadeIn>
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-black text-[#102222]">Join the Sovereign Alliance</h1>
+            <h1 className="text-4xl font-black text-[#102222]">Join the aquaViv Alliance</h1>
             <p className="text-slate-500 mt-4 text-lg">Earn 20% recurring commissions by sharing the source.</p>
           </div>
 

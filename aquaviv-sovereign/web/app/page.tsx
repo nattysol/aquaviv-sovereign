@@ -153,7 +153,7 @@ export default function Home() {
         </div>
       </section>
 
-     {/* 4. THE SOVEREIGN PROTOCOL (Replaces single product CTA) */}
+     {/* 4. THE PROTOCOL (Replaces single product CTA) */}
       <section className="py-24 bg-white relative overflow-hidden">
         {/* Subtle background decoration */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-slate-50 rounded-[100%] blur-3xl -z-10" />

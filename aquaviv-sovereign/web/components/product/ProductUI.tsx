@@ -61,7 +61,7 @@ export function ProductUI({ product, variantId }: { product: any, variantId: str
           >
             <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg">SAVE 20%</div>
             <span className="block font-bold text-slate-900">90 Day Supply</span>
-            <span className="text-xs text-slate-500">Commit to Sovereignty</span>
+            <span className="text-xs text-slate-500">Commit to Hydration Goals</span>
           </button>
         </div>
       </div>
@@ -104,7 +104,7 @@ export function ProductUI({ product, variantId }: { product: any, variantId: str
           onClick={() => setActiveTab(activeTab === 'sourcing' ? null : 'sourcing')}
         >
           <p className="text-slate-600 leading-relaxed text-sm">
-            Sovereign minerals are solar-harvested from the Great Salt Lake...
+            Bamboo salt minerals harvested from the Korean Coast...
           </p>
         </AccordionItem>
 

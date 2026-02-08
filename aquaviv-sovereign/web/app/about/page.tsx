@@ -16,11 +16,11 @@ export default function AboutPage() {
           <FadeIn>
             <span className="text-accent font-bold tracking-widest uppercase text-xs mb-4 block">Our Philosophy</span>
             <h1 className="text-4xl md:text-6xl font-black mb-8 tracking-tight">
-              Reclaim Your <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">Biological Sovereignty</span>
+              Reclaim Your <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">Hydration</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-              We are not a supplement company. We are an optimization protocol. 
-              In a world of depleted soil and dead water, AquaViv restores the foundational mineral matrix your cells demand.
+              We are not a supplement company. We are an hydration optimization protocol. 
+              In a world of depleted soil and dead water, aquaViv restores the foundational mineral complex your cells demand.
             </p>
           </FadeIn>
         </div>
@@ -68,7 +68,7 @@ export default function AboutPage() {
       <section className="bg-white py-24 border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">The Sovereign Standard</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Next Level Standards</h2>
             <p className="text-slate-500">We do not compromise on purity. Every batch is rigorously tested for potency and safety.</p>
           </div>
 

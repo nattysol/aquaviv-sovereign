@@ -26,7 +26,7 @@ export default defineType({
       name: 'code',
       title: 'Discount Code',
       type: 'string',
-      description: 'The code they share (e.g., SOVEREIGN20). Must match a Shopify Discount Code.',
+      description: 'The code they share (e.g., HYDRAATE20). Must match a Shopify Discount Code.',
     }),
     defineField({
       name: 'commissionRate',

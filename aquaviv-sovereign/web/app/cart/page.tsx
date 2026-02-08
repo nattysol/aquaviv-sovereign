@@ -29,8 +29,8 @@ export default function CartPage() {
           <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <ShoppingBag className="w-8 h-8 text-slate-400" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Your Ritual is Empty</h1>
-          <p className="text-slate-500 mb-8">Begin your path to sovereignty by selecting your protocol.</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Your Cart is Empty</h1>
+          <p className="text-slate-500 mb-8">Begin your path to cellular hydration by selecting your protocol.</p>
           <Link href="/shop" className="inline-flex items-center justify-center px-8 py-3 bg-primary text-white font-bold rounded-lg hover:bg-slate-800 transition-all">
             Browse The Collection
           </Link>
@@ -43,7 +43,7 @@ export default function CartPage() {
     <main className="min-h-screen bg-surface-light pt-32 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-12">Your Active Ritual</h1>
+        <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-12">Your Active Cart</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           

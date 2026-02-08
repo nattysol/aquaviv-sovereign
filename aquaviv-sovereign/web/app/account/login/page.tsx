@@ -41,7 +41,7 @@ export default function LoginPage() {
         <div className="max-w-xl">
           <FadeIn>
             <h1 className="text-5xl xl:text-6xl font-black leading-tight tracking-tight mb-8">
-              Unlock Your Sovereign Dashboard
+              Unlock Your aquaViv Dashboard
             </h1>
             <p className="text-lg text-[#13ecec] mb-10 font-medium">
               Experience the pinnacle of cellular hydration and revitalization.
@@ -52,15 +52,15 @@ export default function LoginPage() {
               <div className="grid gap-5">
                 <FeatureRow icon={<Activity />} text="Personal Wellness Timeline" />
                 <FeatureRow icon={<Library />} text="Exclusive Protocol Library" />
-                <FeatureRow icon={<Award />} text="Sovereign Rewards & Tiers" />
-                <FeatureRow icon={<Calendar />} text="Ritual Control (Easy Subscriptions)" />
+                <FeatureRow icon={<Award />} text="Loyalty Rewards & Tiers" />
+                <FeatureRow icon={<Calendar />} text="Subscription Control" />
               </div>
             </div>
           </FadeIn>
         </div>
 
         <div className="absolute bottom-10 left-12 xl:left-24 text-sm text-white/60">
-          © {new Date().getFullYear()} aquaViv Sovereign Wellness. All rights reserved.
+          © {new Date().getFullYear()} aquaViv Advanced Cellular Hydration. All rights reserved.
         </div>
       </div>
 
@@ -80,8 +80,8 @@ export default function LoginPage() {
         <div className="w-full max-w-[440px] space-y-8">
           <FadeIn delay={0.1}>
             <div className="text-left">
-              <h2 className="text-3xl font-extrabold text-[#0d1b1b] leading-tight">Welcome Back to the Ritual</h2>
-              <p className="mt-3 text-slate-500">Enter your credentials to access your sovereign space.</p>
+              <h2 className="text-3xl font-extrabold text-[#0d1b1b] leading-tight">Welcome Back to the aquaViv</h2>
+              <p className="mt-3 text-slate-500">Enter your credentials to access your personal hydration space.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -129,7 +129,7 @@ export default function LoginPage() {
                 disabled={isLoading}
                 className="flex w-full items-center justify-center rounded-lg bg-[#13ecec] py-4 text-base font-bold text-[#0d1b1b] shadow-lg shadow-[#13ecec]/20 hover:bg-[#13ecec]/90 hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Accessing Ritual...' : 'Sign In'}
+                {isLoading ? 'Accessing Your Personal aquaViv Account ...' : 'Sign In'}
               </button>
             </form>
 
