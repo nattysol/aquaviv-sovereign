@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
-    { role: 'assistant', content: "I am the Sovereign AI. Ask me about the hydration protocol." }
+    { role: 'assistant', content: "I am aquaViv Hydration Coach. Ask me about your hydration goals or questions." }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -107,7 +107,7 @@ export function ChatWidget() {
                   <div className="w-2.5 h-2.5 bg-[#13ecec] rounded-full animate-pulse" />
                   <div className="absolute inset-0 bg-[#13ecec] rounded-full animate-ping opacity-20" />
                 </div>
-                <span className="font-bold tracking-wide text-sm font-mono">SOVEREIGN INTEL</span>
+                <span className="font-bold tracking-wide text-sm font-mono">HYDRATION COACH</span>
               </div>
               <button 
                 onClick={() => setIsOpen(false)} 

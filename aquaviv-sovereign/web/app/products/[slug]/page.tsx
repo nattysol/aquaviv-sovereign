@@ -358,6 +358,14 @@ export default async function ProductPage({ params }: PageProps) {
           </div>
         </section>
       )}
+      {/* --- NEW: IN-LINE DISCLAIMER --- */}
+   <div className="pt-6 border-t border-slate-100">
+      <p className="text-xs text-slate-400 italic leading-relaxed">
+        *FDA Disclaimer: The efficacy of these products has not been confirmed by FDA-approved research. 
+        This product is not intended to diagnose, treat, cure or prevent any disease. 
+        All information presented here is not meant as a substitute for or alternative to information from health care practitioners.
+      </p>
+   </div>
 
     </main>
   );

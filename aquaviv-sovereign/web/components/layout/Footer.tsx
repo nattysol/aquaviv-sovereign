@@ -89,6 +89,19 @@ export function Footer() {
         </div>
       </div>
 
+{/* --- FDA DISCLAIMER SECTION --- */}
+    <div className="border-t border-white/10 mt-12 pt-8">
+      <div className="max-w-4xl mx-auto text-center space-y-4">
+        <p className="text-[10px] leading-relaxed text-slate-500 uppercase tracking-wide">
+          *These statements have not been evaluated by the Food and Drug Administration. 
+          This product is not intended to diagnose, treat, cure, or prevent any disease.
+        </p>
+        <p className="text-[10px] text-slate-600">
+          Consult your physician before use if you are pregnant, nursing, have a medical condition, or are taking any medication.
+        </p>
+      </div>
+    </div>
+
       <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
         <p>&copy; {new Date().getFullYear()} aquaViv Hydration. All rights reserved.</p>
         <div className="flex gap-6">
