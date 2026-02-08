@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: 'aquaViv | Sovereign Hydration',
   description: 'Clinical grade minerals for biological sovereignty.',
   icons: {
-    icon: '/icon.webp', // <--- Add this line
+    icon: '/icon.svg', // <--- Add this line
   },
 };
 
