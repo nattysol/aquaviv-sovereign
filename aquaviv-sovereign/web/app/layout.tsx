@@ -35,7 +35,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={manrope.className}>
-        <Suspense fallback={null}>
+        {/* Vercel Best Practice: "UI Skeletons" 
+  We render a 'Ghost Header' so the page height doesn't jump when the real Navbar loads.
+*/}
+<Suspense fallback={
+  <div className="fixed top-0 w-full h-20 bg-white/80 backdrop-blur-md z-50 border-b border-slate-100 flex items-center px-6">
+    <div className="w-8 h-8 bg-slate-200 rounded-full animate-pulse" /> {/* Logo Placeholder */}
+  </div>
+}>
           <ReferralProvider>
             {/* 2. Wrap CartProvider inside ChatProvider (or vice versa, order doesn't matter much) */}
             <ChatProvider>
