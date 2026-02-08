@@ -3,6 +3,9 @@ import { Manrope } from 'next/font/google';
 import './globals.css';
 import { Suspense } from 'react';
 import Script from 'next/script';
+import { ChatWidget } from '@/components/layout/ChatWidget';
+import { ChatProvider } from '@/components/providers/ChatContext';
+import { ChatModal } from '@/components/layout/ChatModal';
 
 // Providers
 import { CartProvider } from '@/components/providers/CartContext';
@@ -33,6 +36,8 @@ export default function RootLayout({
       <body className={manrope.className}>
         <Suspense fallback={null}>
           <ReferralProvider>
+            {/* 2. Wrap CartProvider inside ChatProvider (or vice versa, order doesn't matter much) */}
+            <ChatProvider>
             <CartProvider>
               
               {/* --- THE FIX: ONLY USE PAGESHELL --- */}
@@ -40,7 +45,8 @@ export default function RootLayout({
               <PageShell>
                 {children}
               </PageShell>
-              
+              {/* 2. PLACE CHAT WIDGET HERE (Above footer, below navs) */}
+              <ChatModal />
               {/* Analytics stay global */}
               <GoogleAnalytics />
               <Script 
@@ -50,6 +56,7 @@ export default function RootLayout({
               />
               
             </CartProvider>
+            </ChatProvider>
           </ReferralProvider>
         </Suspense>
       </body>

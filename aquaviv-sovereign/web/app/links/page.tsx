@@ -11,7 +11,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 
 // --- CONFIGURATION ---
-const YOUTUBE_VIDEO_ID = "NoJwmTojdWk"; // <--- REPLACE THIS WITH YOUR REAL ID
+const YOUTUBE_VIDEO_ID = "NoJwmTojdWk"; // <--- REPLACE WITH YOUR ID IF NEEDED
 
 // --- TYPES ---
 type Message = {
@@ -23,7 +23,7 @@ type Message = {
 
 export default function SocialHubPage() {
   const [showChat, setShowChat] = useState(false);
-  const [showVideo, setShowVideo] = useState(false); // <--- New State for Video
+  const [showVideo, setShowVideo] = useState(false);
   
   // --- CHAT STATE ---
   const [inputValue, setInputValue] = useState("");
@@ -37,50 +37,90 @@ export default function SocialHubPage() {
   ]);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom
   useEffect(() => {
     if (showChat) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isTyping, showChat]);
 
+  // --- THE FIXED AI ENGINE (Streaming Support) ---
   const handleSend = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isTyping) return;
 
     const userText = inputValue;
+    setInputValue(""); // Clear input immediately
+    setIsTyping(true);
+
+    // 1. Add User Message
     const newUserMsg: Message = {
       id: Date.now().toString(),
       text: userText,
       sender: 'user',
     };
-
     setMessages(prev => [...prev, newUserMsg]);
-    setInputValue("");
-    setIsTyping(true);
 
     try {
+      // 2. Prepare for Bot Response
+      const botMsgId = (Date.now() + 1).toString();
+      
+      // Add a placeholder message for the bot that we will fill up
+      setMessages(prev => [...prev, {
+        id: botMsgId,
+        text: "", // Starts empty
+        sender: 'bot'
+      }]);
+
+      // 3. Send Request
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userText }),
+        body: JSON.stringify({ 
+          // Send history so it remembers context
+          messages: messages.map(m => ({ 
+             role: m.sender === 'user' ? 'user' : 'assistant', 
+             content: m.text 
+          })).concat([{ role: 'user', content: userText }])
+        }),
       });
 
-      const data = await response.json();
+      if (!response.ok) throw new Error("Network response was not ok");
+      if (!response.body) throw new Error("No readable stream");
 
-      const botReply: Message = {
-        id: (Date.now() + 1).toString(),
-        text: data.reply || "Connection error.",
-        sender: 'bot',
-      };
-      
-      setMessages(prev => [...prev, botReply]);
+      // 4. STREAM READER (The Fix)
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        const chunkValue = decoder.decode(value, { stream: !done });
+        
+        // Update the SPECIFIC bot message in state
+        setMessages(prev => prev.map(msg => 
+          msg.id === botMsgId 
+            ? { ...msg, text: msg.text + chunkValue } 
+            : msg
+        ));
+      }
 
     } catch (error) {
-      const errorReply: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "Signal interrupted. Please check your connection.",
-        sender: 'bot',
-      };
-      setMessages(prev => [...prev, errorReply]);
+      console.error("Chat Error:", error);
+      // Replace the empty message with an error
+      setMessages(prev => {
+        const newHistory = [...prev];
+        // Remove the empty bot message if it failed
+        if (newHistory[newHistory.length - 1].sender === 'bot' && !newHistory[newHistory.length - 1].text) {
+          newHistory.pop();
+        }
+        return [...newHistory, {
+          id: Date.now().toString(),
+          text: "Signal interrupted. Please check your connection.",
+          sender: 'bot'
+        }];
+      });
     } finally {
       setIsTyping(false); 
     }
@@ -106,13 +146,14 @@ export default function SocialHubPage() {
           <div className="relative group cursor-pointer">
             <div className="absolute -inset-1 bg-[#13ecec] rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
             <div className="relative size-28 rounded-full border-4 border-white dark:border-[#102222] shadow-xl overflow-hidden bg-slate-100">
+               {/* Ensure you have this image in public/icon.webp */}
                <Image 
-                  src="/icon.webp" 
-                  alt="aquaViv Logo" 
-                  fill 
-                  className="object-cover" 
-                  priority
-                />
+                 src="/icon.webp" 
+                 alt="aquaViv Logo" 
+                 fill 
+                 className="object-cover" 
+                 priority
+               />
             </div>
             <div className="absolute bottom-1 right-1 bg-[#13ecec] text-[#0d1b1b] rounded-full p-1 border-2 border-white dark:border-[#102222] flex items-center justify-center">
               <Check size={14} strokeWidth={4} />
@@ -143,9 +184,9 @@ export default function SocialHubPage() {
             </div>
           </Link>
 
-          {/* B. VIDEO: MINERAL SCIENCE (Triggers Overlay) */}
+          {/* B. VIDEO: MINERAL SCIENCE */}
           <button 
-             onClick={() => setShowVideo(true)} // <--- TRIGGERS VIDEO
+             onClick={() => setShowVideo(true)} 
              className="group flex items-center gap-4 rounded-2xl bg-[#082f2f] p-5 text-white shadow-lg relative overflow-hidden hover:scale-[1.02] transition-transform duration-300 w-full text-left"
           >
              <div className="absolute right-0 top-0 w-32 h-32 bg-[#13ecec]/10 rounded-full -mr-16 -mt-16 blur-xl" />
@@ -206,9 +247,9 @@ export default function SocialHubPage() {
         {/* 4. FOOTER */}
         <footer className="mt-8 flex flex-col items-center gap-6">
            <div className="flex items-center gap-4">
-              <Link href="https://instagram.com/aquaviv" target="_blank" className="size-10 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-[#13ecec] hover:text-[#102222] transition-colors text-[#0d1b1b] dark:text-white group">
-                <Instagram size={18} />
-              </Link>
+             <Link href="https://instagram.com/aquaviv" target="_blank" className="size-10 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-[#13ecec] hover:text-[#102222] transition-colors text-[#0d1b1b] dark:text-white group">
+               <Instagram size={18} />
+             </Link>
            </div>
            <p className="text-xs text-[#4c9a9a]/60">© {new Date().getFullYear()} aquaViv. All Rights Reserved.</p>
         </footer>
@@ -283,7 +324,7 @@ export default function SocialHubPage() {
                     </div>
                   ))}
 
-                  {isTyping && (
+                  {isTyping && !messages[messages.length - 1]?.text && (
                     <div className="flex items-center gap-1.5 px-4 py-3 bg-[#e9e9eb] dark:bg-[#3a3a3c] w-fit rounded-[1.2rem] rounded-bl-sm">
                        <div className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" />
                        <div className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce delay-100" />
@@ -315,14 +356,13 @@ export default function SocialHubPage() {
                         <ArrowUp size={16} strokeWidth={3} />
                      </button>
                   </div>
-                  <div className="h-4 sm:hidden"></div>
                </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
-      {/* 6. VIDEO PLAYER OVERLAY (NEW) */}
+      {/* 6. VIDEO PLAYER OVERLAY */}
       <AnimatePresence>
         {showVideo && (
           <motion.div 
@@ -331,10 +371,8 @@ export default function SocialHubPage() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-[#102222]/80 backdrop-blur-3xl"
           >
-            {/* The Player Container */}
             <div className="relative w-full max-w-5xl aspect-video bg-black rounded-3xl overflow-hidden shadow-[0_0_50px_-10px_rgba(19,236,236,0.3)] border border-[#13ecec]/30">
                
-               {/* Close Button (Top Right) */}
                <button 
                  onClick={() => setShowVideo(false)}
                  className="absolute top-4 right-4 z-20 size-10 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white border border-white/10 transition-colors backdrop-blur-md"
@@ -342,13 +380,11 @@ export default function SocialHubPage() {
                  <X size={20} />
                </button>
 
-               {/* Video Header (Top Left) */}
                <div className="absolute top-6 left-6 z-10 pointer-events-none">
                  <span className="text-[10px] uppercase tracking-[0.2em] text-[#13ecec] font-bold block mb-1">Educational Series</span>
                  <h4 className="text-sm md:text-base font-medium text-white/90 tracking-wide">The Mineral Science: Deep-Sea Ritual</h4>
                </div>
 
-               {/* YouTube Iframe */}
                <iframe 
                  className="w-full h-full"
                  src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`} 
