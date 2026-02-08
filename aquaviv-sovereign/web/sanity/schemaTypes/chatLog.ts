@@ -6,16 +6,24 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'userName', // <--- NEW
+      title: 'User Name',
+      type: 'string',
+    }),
+    defineField({
+      name: 'userEmail', // <--- NEW
+      title: 'User Email',
+      type: 'string',
+    }),
+    defineField({
       name: 'userMessage',
       title: 'User Question',
       type: 'text',
-      rows: 2,
     }),
     defineField({
       name: 'aiReply',
       title: 'AI Response',
       type: 'text',
-      rows: 4,
     }),
     defineField({
       name: 'timestamp',
@@ -24,15 +32,9 @@ export default defineType({
     }),
     defineField({
       name: 'isFlagged',
-      title: 'Needs Human Follow-up?',
+      title: 'Flag for Review',
       type: 'boolean',
       initialValue: false,
     }),
   ],
-  preview: {
-    select: {
-      title: 'userMessage',
-      subtitle: 'timestamp',
-    },
-  },
 })

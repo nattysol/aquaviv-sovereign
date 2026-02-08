@@ -11,7 +11,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 
 // --- CONFIGURATION ---
-const YOUTUBE_VIDEO_ID = "NoJwmTojdWk"; // <--- REPLACE WITH YOUR ID IF NEEDED
+const YOUTUBE_VIDEO_ID = "NoJwmTojdWk"; // Replace with your video ID
 
 // --- TYPES ---
 type Message = {
@@ -25,13 +25,18 @@ export default function SocialHubPage() {
   const [showChat, setShowChat] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   
+  // --- LEAD CAPTURE STATE ---
+  // 0 = Ask Name, 1 = Ask Email, 2 = AI Chat Mode
+  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2>(0); 
+  const [userData, setUserData] = useState({ name: '', email: '' });
+
   // --- CHAT STATE ---
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Welcome to the Ritual. Need help with your order or protocol?",
+      text: "Welcome to the Ritual. To begin, what is your first name?",
       sender: 'bot',
     }
   ]);
@@ -45,15 +50,14 @@ export default function SocialHubPage() {
     }
   }, [messages, isTyping, showChat]);
 
-  // --- THE FIXED AI ENGINE (Streaming Support) ---
+  // --- THE LOGIC ENGINE ---
   const handleSend = async () => {
     if (!inputValue.trim() || isTyping) return;
 
-    const userText = inputValue;
+    const userText = inputValue.trim();
     setInputValue(""); // Clear input immediately
-    setIsTyping(true);
-
-    // 1. Add User Message
+    
+    // 1. Always add user message to UI immediately
     const newUserMsg: Message = {
       id: Date.now().toString(),
       text: userText,
@@ -61,34 +65,71 @@ export default function SocialHubPage() {
     };
     setMessages(prev => [...prev, newUserMsg]);
 
+    // --- STEP 0: CAPTURE NAME ---
+    if (onboardingStep === 0) {
+      setUserData(prev => ({ ...prev, name: userText }));
+      setIsTyping(true);
+      
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          text: `Nice to meet you, ${userText}. What is your email address?`,
+          sender: 'bot'
+        }]);
+        setOnboardingStep(1);
+        setIsTyping(false);
+      }, 600); // Fake delay for realism
+      return;
+    }
+
+    // --- STEP 1: CAPTURE EMAIL ---
+    if (onboardingStep === 1) {
+      setUserData(prev => ({ ...prev, email: userText }));
+      setIsTyping(true);
+      
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          text: "Perfect. How can we help with your hydration journey?",
+          sender: 'bot'
+        }]);
+        setOnboardingStep(2); // <--- UNLOCKS AI MODE
+        setIsTyping(false);
+      }, 600);
+      return;
+    }
+
+    // --- STEP 2: REAL AI CHAT ---
+    setIsTyping(true);
     try {
-      // 2. Prepare for Bot Response
       const botMsgId = (Date.now() + 1).toString();
       
-      // Add a placeholder message for the bot that we will fill up
+      // Add placeholder for bot response
       setMessages(prev => [...prev, {
         id: botMsgId,
         text: "", // Starts empty
         sender: 'bot'
       }]);
 
-      // 3. Send Request
+      // Prepare History for AI (Exclude the onboarding steps if you want, or keep them)
+      // Here we keep everything so the AI knows the user's name
+      const chatHistory = messages.map(m => ({
+        role: m.sender === 'user' ? 'user' : 'assistant',
+        content: m.text
+      })).concat([{ role: 'user', content: userText }]);
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          // Send history so it remembers context
-          messages: messages.map(m => ({ 
-             role: m.sender === 'user' ? 'user' : 'assistant', 
-             content: m.text 
-          })).concat([{ role: 'user', content: userText }])
+          userData: userData, // <--- Send captured leads to backend
+          messages: chatHistory
         }),
       });
 
-      if (!response.ok) throw new Error("Network response was not ok");
-      if (!response.body) throw new Error("No readable stream");
+      if (!response.ok || !response.body) throw new Error("Connection error");
 
-      // 4. STREAM READER (The Fix)
+      // STREAM READER logic
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let done = false;
@@ -100,27 +141,17 @@ export default function SocialHubPage() {
         
         // Update the SPECIFIC bot message in state
         setMessages(prev => prev.map(msg => 
-          msg.id === botMsgId 
-            ? { ...msg, text: msg.text + chunkValue } 
-            : msg
+          msg.id === botMsgId ? { ...msg, text: msg.text + chunkValue } : msg
         ));
       }
 
     } catch (error) {
       console.error("Chat Error:", error);
-      // Replace the empty message with an error
-      setMessages(prev => {
-        const newHistory = [...prev];
-        // Remove the empty bot message if it failed
-        if (newHistory[newHistory.length - 1].sender === 'bot' && !newHistory[newHistory.length - 1].text) {
-          newHistory.pop();
-        }
-        return [...newHistory, {
-          id: Date.now().toString(),
-          text: "Signal interrupted. Please check your connection.",
-          sender: 'bot'
-        }];
-      });
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        text: "Signal interrupted. Please check your connection.",
+        sender: 'bot'
+      }]);
     } finally {
       setIsTyping(false); 
     }
@@ -146,14 +177,7 @@ export default function SocialHubPage() {
           <div className="relative group cursor-pointer">
             <div className="absolute -inset-1 bg-[#13ecec] rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
             <div className="relative size-28 rounded-full border-4 border-white dark:border-[#102222] shadow-xl overflow-hidden bg-slate-100">
-               {/* Ensure you have this image in public/icon.webp */}
-               <Image 
-                 src="/icon.webp" 
-                 alt="aquaViv Logo" 
-                 fill 
-                 className="object-cover" 
-                 priority
-               />
+               <Image src="/icon.webp" alt="aquaViv Logo" fill className="object-cover" priority />
             </div>
             <div className="absolute bottom-1 right-1 bg-[#13ecec] text-[#0d1b1b] rounded-full p-1 border-2 border-white dark:border-[#102222] flex items-center justify-center">
               <Check size={14} strokeWidth={4} />
@@ -167,12 +191,9 @@ export default function SocialHubPage() {
 
         {/* 3. CARD STACK */}
         <main className="flex flex-col gap-4">
-          
-          {/* A. HERO: SHOP COLLECTION */}
           <Link href="/shop" className="group relative block h-40 w-full overflow-hidden rounded-2xl bg-[#13ecec] shadow-lg hover:scale-[1.02] transition-transform duration-300">
             <div className="absolute inset-0 bg-gradient-to-tr from-[#13ecec] to-[#0d9d9d] opacity-100" />
             <div className="absolute inset-0 bg-black/10" />
-            
             <div className="relative h-full flex items-end justify-between p-6">
               <div className="flex flex-col">
                 <span className="text-xs font-bold uppercase tracking-widest text-[#0d1b1b]/60 mb-1">New Drop</span>
@@ -184,11 +205,7 @@ export default function SocialHubPage() {
             </div>
           </Link>
 
-          {/* B. VIDEO: MINERAL SCIENCE */}
-          <button 
-             onClick={() => setShowVideo(true)} 
-             className="group flex items-center gap-4 rounded-2xl bg-[#082f2f] p-5 text-white shadow-lg relative overflow-hidden hover:scale-[1.02] transition-transform duration-300 w-full text-left"
-          >
+          <button onClick={() => setShowVideo(true)} className="group flex items-center gap-4 rounded-2xl bg-[#082f2f] p-5 text-white shadow-lg relative overflow-hidden hover:scale-[1.02] transition-transform duration-300 w-full text-left">
              <div className="absolute right-0 top-0 w-32 h-32 bg-[#13ecec]/10 rounded-full -mr-16 -mt-16 blur-xl" />
              <div className="flex-shrink-0 w-14 h-14 rounded-full bg-[#13ecec]/20 flex items-center justify-center border border-[#13ecec]/30">
                <PlayCircle size={32} className="text-[#13ecec] fill-[#13ecec]/20" />
@@ -199,11 +216,7 @@ export default function SocialHubPage() {
              </div>
           </button>
 
-          {/* C. INTERACTIVE: CONTACT SUPPORT */}
-          <button 
-            onClick={() => setShowChat(true)}
-            className="relative group flex items-center gap-4 rounded-2xl bg-white dark:bg-[#1a3a3a] p-5 shadow-sm border-2 border-[#13ecec] hover:scale-[1.02] transition-transform duration-300 text-left w-full"
-          >
+          <button onClick={() => setShowChat(true)} className="relative group flex items-center gap-4 rounded-2xl bg-white dark:bg-[#1a3a3a] p-5 shadow-sm border-2 border-[#13ecec] hover:scale-[1.02] transition-transform duration-300 text-left w-full">
              <div className="absolute -inset-1 bg-[#13ecec]/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
              <div className="relative flex-shrink-0 w-14 h-14 rounded-full bg-[#13ecec] flex items-center justify-center">
                <MessageCircle size={24} className="text-[#0d1b1b] fill-current" />
@@ -220,7 +233,6 @@ export default function SocialHubPage() {
              </div>
           </button>
 
-          {/* D. REWARDS */}
           <Link href="/account/dashboard" className="group flex items-center gap-4 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-md p-5 shadow-sm border border-white/20 hover:scale-[1.02] transition-transform duration-300">
              <div className="flex-shrink-0 w-14 h-14 rounded-full bg-[#13ecec]/10 flex items-center justify-center">
                <Star size={24} className="text-[#4c9a9a] fill-current" />
@@ -231,7 +243,6 @@ export default function SocialHubPage() {
              </div>
           </Link>
 
-          {/* E. QUIZ */}
           <Link href="/quiz" className="group flex items-center gap-4 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-md p-5 shadow-sm border border-white/20 hover:scale-[1.02] transition-transform duration-300">
              <div className="flex-shrink-0 w-14 h-14 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center">
                <HelpCircle size={24} className="text-slate-600 dark:text-white" />
@@ -241,10 +252,8 @@ export default function SocialHubPage() {
                <p className="text-slate-500 text-sm">Find your optimal balance</p>
              </div>
           </Link>
-
         </main>
 
-        {/* 4. FOOTER */}
         <footer className="mt-8 flex flex-col items-center gap-6">
            <div className="flex items-center gap-4">
              <Link href="https://instagram.com/aquaviv" target="_blank" className="size-10 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-[#13ecec] hover:text-[#102222] transition-colors text-[#0d1b1b] dark:text-white group">
@@ -253,7 +262,6 @@ export default function SocialHubPage() {
            </div>
            <p className="text-xs text-[#4c9a9a]/60">© {new Date().getFullYear()} aquaViv. All Rights Reserved.</p>
         </footer>
-
       </div>
 
       {/* 5. IOS CHAT OVERLAY */}
@@ -282,12 +290,7 @@ export default function SocialHubPage() {
                      </button>
                      <div className="flex flex-col items-center">
                         <div className="size-10 rounded-full border border-[#13ecec] overflow-hidden mb-1 relative">
-                           <Image 
-                             src="/icon.webp" 
-                             alt="Concierge Avatar" 
-                             fill 
-                             className="object-cover" 
-                           />
+                           <Image src="/icon.webp" alt="Concierge Avatar" fill className="object-cover" />
                         </div>
                         <span className="text-[11px] font-bold text-gray-500 dark:text-[#13ecec]/60 uppercase tracking-tighter">aquaViv Support</span>
                      </div>
@@ -309,13 +312,7 @@ export default function SocialHubPage() {
                       key={msg.id}
                       className={`flex flex-col max-w-[85%] ${msg.sender === 'user' ? 'items-end self-end' : 'items-start self-start'}`}
                     >
-                       <div 
-                         className={`px-4 py-2.5 text-sm leading-tight shadow-sm
-                           ${msg.sender === 'user' 
-                             ? 'bg-[#007aff] text-white rounded-[1.2rem] rounded-br-sm' 
-                             : 'bg-[#e9e9eb] dark:bg-[#3a3a3c] text-black dark:text-white rounded-[1.2rem] rounded-bl-sm'
-                           }`}
-                       >
+                       <div className={`px-4 py-2.5 text-sm leading-tight shadow-sm ${msg.sender === 'user' ? 'bg-[#007aff] text-white rounded-[1.2rem] rounded-br-sm' : 'bg-[#e9e9eb] dark:bg-[#3a3a3c] text-black dark:text-white rounded-[1.2rem] rounded-bl-sm'}`}>
                           {msg.text}
                        </div>
                        {msg.sender === 'user' && (
@@ -343,7 +340,8 @@ export default function SocialHubPage() {
                        value={inputValue}
                        onChange={(e) => setInputValue(e.target.value)}
                        onKeyDown={handleKeyDown}
-                       placeholder="Live Chat"
+                       // DYNAMIC PLACEHOLDER BASED ON STEP
+                       placeholder={onboardingStep === 0 ? "Enter your Name..." : onboardingStep === 1 ? "Enter your Email..." : "Ask anything..."}
                        className="flex-1 bg-transparent border-none focus:ring-0 text-base p-0 text-black dark:text-white placeholder-gray-400 outline-none"
                      />
                      <button 
@@ -366,39 +364,22 @@ export default function SocialHubPage() {
       <AnimatePresence>
         {showVideo && (
           <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-[#102222]/80 backdrop-blur-3xl"
           >
             <div className="relative w-full max-w-5xl aspect-video bg-black rounded-3xl overflow-hidden shadow-[0_0_50px_-10px_rgba(19,236,236,0.3)] border border-[#13ecec]/30">
-               
-               <button 
-                 onClick={() => setShowVideo(false)}
-                 className="absolute top-4 right-4 z-20 size-10 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white border border-white/10 transition-colors backdrop-blur-md"
-               >
+               <button onClick={() => setShowVideo(false)} className="absolute top-4 right-4 z-20 size-10 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white border border-white/10 transition-colors backdrop-blur-md">
                  <X size={20} />
                </button>
-
                <div className="absolute top-6 left-6 z-10 pointer-events-none">
                  <span className="text-[10px] uppercase tracking-[0.2em] text-[#13ecec] font-bold block mb-1">Educational Series</span>
                  <h4 className="text-sm md:text-base font-medium text-white/90 tracking-wide">The Mineral Science: Deep-Sea Ritual</h4>
                </div>
-
-               <iframe 
-                 className="w-full h-full"
-                 src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`} 
-                 title="The Mineral Science" 
-                 frameBorder="0" 
-                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                 allowFullScreen
-               ></iframe>
-
+               <iframe className="w-full h-full" src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`} title="The Mineral Science" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }
