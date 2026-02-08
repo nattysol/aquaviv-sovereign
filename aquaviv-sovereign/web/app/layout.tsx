@@ -6,6 +6,7 @@ import Script from 'next/script';
 import { ChatWidget } from '@/components/layout/ChatWidget';
 import { ChatProvider } from '@/components/providers/ChatContext';
 import { ChatModal } from '@/components/layout/ChatModal';
+import { Toaster } from 'sonner'; // <--- 1. Import This
 
 // Providers
 import { CartProvider } from '@/components/providers/CartContext';
@@ -54,7 +55,8 @@ export default function RootLayout({
                 strategy="afterInteractive"
                 src={KLAVIYO_SCRIPT_URL}
               />
-              
+              {/* 2. PLACE TOASTER HERE */}
+              <Toaster position="top-center" richColors />
             </CartProvider>
             </ChatProvider>
           </ReferralProvider>

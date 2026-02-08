@@ -9,6 +9,7 @@ import {
   updateCartLineAPI 
 } from '@/lib/shopify-cart';
 import { useReferral } from './ReferralContext';
+import { toast } from 'sonner'; // <--- NEW: Beautiful notifications
 
 type CartContextType = {
   cart: any | null;
@@ -33,6 +34,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   
   const { referralCode } = useReferral(); 
 
+  // 1. Initialize Cart on Mount
   useEffect(() => {
     const initializeCart = async () => {
       const storedCartId = localStorage.getItem('aquaviv_cart_id');
@@ -48,6 +50,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     initializeCart();
   }, []);
 
+  // 2. Helper: Ensure ID is always a string
   const formatId = useCallback((id: string | number) => {
     if (!id) return '';
     const idStr = String(id);
@@ -55,7 +58,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return `gid://shopify/ProductVariant/${idStr}`;
   }, []);
 
-  // 1. Wrap functions in useCallback so they don't recreate on every render
+  // 3. Memoized Actions
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
   const toggleCart = useCallback(() => setIsOpen(!isOpen), [isOpen]);
@@ -68,6 +71,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       let newCart;
       
+      // Scenario A: Add to existing cart
       if (cart?.id) {
         try {
           newCart = await addToCartAPI(cart.id, variantId, quantity);
@@ -77,23 +81,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           newCart = await createCart(variantId, quantity);
           localStorage.setItem('aquaviv_cart_id', newCart.id);
         }
-      } else {
+      } 
+      // Scenario B: Create new cart
+      else {
         newCart = await createCart(variantId, quantity);
         localStorage.setItem('aquaviv_cart_id', newCart.id);
       }
+
       setCart(newCart);
       setIsOpen(true);
-      
-      // Track Klaviyo Event (optional)
-      // try { console.log("Tracked 'Added to Cart'"); } catch (err) {}
+      toast.success("Added to your ritual"); // <--- Success Toast
+
+      // Optional: Track Klaviyo Event here if needed
+      // try { trackKlaviyoEvent(...) } catch (e) {}
 
     } catch (error) {
       console.error("CRITICAL: Failed to add to cart:", error);
-      alert("Could not add to cart. Please check your connection.");
+      toast.error("Could not add to cart. Please check your connection."); // <--- Error Toast
     } finally {
       setIsLoading(false);
     }
-  }, [cart?.id, formatId]);
+  }, [cart?.id, formatId]); // Dependencies ensure this function is stable
 
   const removeItem = useCallback(async (lineId: string) => {
     if (!cart?.id) return;
@@ -101,8 +109,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       const newCart = await removeFromCartAPI(cart.id, lineId);
       setCart(newCart);
+      toast.success("Item removed");
     } catch (error) {
       console.error("Failed to remove item:", error);
+      toast.error("Could not remove item");
     } finally {
       setIsLoading(false);
     }
@@ -116,6 +126,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setCart(newCart);
     } catch (error) {
       console.error("Failed to update quantity:", error);
+      toast.error("Could not update quantity");
     } finally {
       setIsLoading(false);
     }
@@ -123,7 +134,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const itemCount = cart?.totalQuantity || 0;
 
-  // Calculate URL (this is fast, so we can keep it here, or memoize it too)
+  // 4. Compute Final Checkout URL (Memoized)
   const finalCheckoutUrl = useMemo(() => {
     const baseCheckoutUrl = cart?.checkoutUrl || '';
     if (baseCheckoutUrl && referralCode) {
@@ -133,7 +144,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return baseCheckoutUrl;
   }, [cart?.checkoutUrl, referralCode]);
 
-  // 2. THE BIG FIX: Wrap the entire value object in useMemo
+  // 5. Context Value (Memoized Object)
+  // This prevents the entire app from re-rendering just because this object was recreated.
   const contextValue = useMemo(() => ({
     cart, 
     itemCount, 
